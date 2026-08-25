@@ -1,0 +1,101 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage Products | E-Tech Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <h3 class="fw-bold mb-1">Product Inventory</h3>
+    <p class="text-muted small mb-0">Manage catalog products, stock levels, and pricing.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('admin_product_new') }}" class="btn btn-primary rounded-pill px-3 shadow-sm">
+      <i class="bi bi-plus-lg me-1"></i> Add New Product
+    </a>
+  </div>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+  <div class="row g-3 align-items-center">
+    <div class="col-12 col-md-5">
+      <div class="input-group input-group-sm rounded-pill overflow-hidden border">
+        <span class="input-group-text bg-white border-0 ps-3"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" class="form-control border-0 bg-white" placeholder="Search product name or brand...">
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <select class="form-select form-select-sm rounded-pill">
+        <option value="">All Categories</option>
+        <option value="smartphones">Smartphones</option>
+        <option value="laptops">Laptops</option>
+        <option value="audio">Audio</option>
+        <option value="tablets">Tablets</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-4 text-md-end text-muted small">
+      Showing <strong>{{ products|length }}</strong> registered products
+    </div>
+  </div>
+</div>
+
+<!-- Products Table -->
+<div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+  <div class="table-responsive">
+    <table class="table align-middle text-nowrap mb-0">
+      <thead class="bg-light small text-muted">
+        <tr>
+          <th>IMAGE</th>
+          <th>PRODUCT TITLE</th>
+          <th>CATEGORY</th>
+          <th>PRICE</th>
+          <th>STOCK</th>
+          <th>STATUS</th>
+          <th class="text-end">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+          <tr>
+            <td>
+              <img src="{{ p.image }}" alt="{{ p.title }}" class="rounded-3 object-fit-cover" style="width: 48px; height: 48px;" onerror="this.src='https://via.placeholder.com/100?text=Product';">
+            </td>
+            <td>
+              <h6 class="fw-bold mb-0 text-truncate" style="max-width: 220px;">
+                <a href="{{ url_for('product_detail', product_id=p.id) }}" target="_blank" class="text-dark text-decoration-none">{{ p.title }}</a>
+              </h6>
+              <small class="text-muted">Brand: {{ p.get("brand", "N/A") }}</small>
+            </td>
+            <td><span class="badge bg-light text-dark border text-uppercase" style="font-size: 0.75rem;">{{ p.category }}</span></td>
+            <td>
+              <span class="fw-bold text-dark">${{ "%.2f"|format(p.price) }}</span>
+              {% if p.get("oldPrice", 0) > p.price %}
+                <br><small class="text-muted text-decoration-line-through">${{ "%.2f"|format(p.oldPrice) }}</small>
+              {% endif %}
+            </td>
+            <td>
+              {% if p.stock > 15 %}
+                <span class="badge bg-success-subtle text-success">{{ p.stock }} in stock</span>
+              {% elif p.stock > 0 %}
+                <span class="badge bg-warning-subtle text-warning">{{ p.stock }} low stock</span>
+              {% else %}
+                <span class="badge bg-danger-subtle text-danger">Out of Stock</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge bg-primary-subtle text-primary">Active</span>
+            </td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                <a href="{{ url_for('product_detail', product_id=p.id) }}" target="_blank" class="btn btn-outline-secondary" title="View Product"><i class="bi bi-eye"></i></a>
+                <a href="{{ url_for('admin_product_edit', product_id=p.id) }}" class="btn btn-outline-secondary" title="Edit Product"><i class="bi bi-pencil"></i></a>
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" title="Delete Product"><i class="bi bi-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

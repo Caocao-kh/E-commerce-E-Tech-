@@ -1,0 +1,110 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage Deals & Promos | E-Tech Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Deals & Promotions</h3>
+    <p class="text-muted small mb-0">Create and schedule flash sales, banner offers, and discount codes.</p>
+  </div>
+  <button class="btn btn-primary rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#dealModal">
+    <i class="bi bi-plus-lg me-1"></i> Add New Deal
+  </button>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+  <div class="table-responsive">
+    <table class="table align-middle text-nowrap mb-0">
+      <thead class="bg-light small text-muted">
+        <tr>
+          <th>DEAL TITLE</th>
+          <th>TARGET PRODUCT</th>
+          <th>DISCOUNT</th>
+          <th>START DATE</th>
+          <th>END DATE</th>
+          <th>STATUS</th>
+          <th class="text-end">ACTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="fw-bold text-dark">Summer Flash Sale 50%</div>
+            <small class="text-muted">Header Hero Campaign</small>
+          </td>
+          <td>Sony WH-1000XM6 Headphones</td>
+          <td><span class="badge bg-danger fs-6">-50% OFF</span></td>
+          <td>Aug 20, 2026</td>
+          <td>Aug 30, 2026</td>
+          <td><span class="badge bg-success-subtle text-success">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dealModal" title="Edit Deal" aria-label="Edit Deal"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" title="Delete Deal" aria-label="Delete Deal"><i class="bi bi-trash"></i></button>
+
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="fw-bold text-dark">MacBook Pro Launch Offer</div>
+            <small class="text-muted">Laptop Category Banner</small>
+          </td>
+          <td>MacBook Pro M4</td>
+          <td><span class="badge bg-warning text-dark fs-6">Save $200</span></td>
+          <td>Aug 15, 2026</td>
+          <td>Sep 01, 2026</td>
+          <td><span class="badge bg-success-subtle text-success">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dealModal" title="Edit Deal" aria-label="Edit Deal"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" title="Delete Deal" aria-label="Delete Deal"><i class="bi bi-trash"></i></button>
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal for Add/Edit Deal -->
+<div class="modal fade" id="dealModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 p-3">
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title fw-bold">Add / Edit Promotional Deal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="event.preventDefault(); bootstrap.Modal.getInstance(document.getElementById('dealModal')).hide(); showToast('Deal saved!', 'success');">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Deal Title</label>
+            <input type="text" class="form-control" placeholder="e.g. Back to School Promo" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Target Product</label>
+            <select class="form-select">
+              <option>iPhone 17 Pro Max</option>
+              <option>Sony WH-1000XM6</option>
+              <option>MacBook Pro M4</option>
+            </select>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold">Discount (%)</label>
+              <input type="number" class="form-control" placeholder="20" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold">End Date</label>
+              <input type="date" class="form-control" required>
+            </div>
+          </div>
+          <div class="text-end mt-4">
+            <button type="button" class="btn btn-light rounded-pill me-2 px-3" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary rounded-pill px-4">Save Deal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage Orders | E-Tech Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Customer Orders</h3>
+    <p class="text-muted small mb-0">Track order statuses, customer fulfillment, and invoice totals.</p>
+  </div>
+</div>
+
+<!-- Order Filter Tabs -->
+<div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+  <div class="d-flex flex-wrap gap-2">
+    <button class="btn btn-dark rounded-pill btn-sm px-3">All Orders (1,245)</button>
+    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Pending (12)</button>
+    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Processing (45)</button>
+    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Shipped (89)</button>
+    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Delivered (1,080)</button>
+    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Cancelled (19)</button>
+  </div>
+</div>
+
+<!-- Orders Table -->
+<div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+  <div class="table-responsive">
+    <table class="table align-middle text-nowrap mb-0">
+      <thead class="bg-light small text-muted">
+        <tr>
+          <th>ORDER ID</th>
+          <th>CUSTOMER</th>
+          <th>DATE</th>
+          <th>ITEMS</th>
+          <th>TOTAL</th>
+          <th>PAYMENT</th>
+          <th>STATUS</th>
+          <th class="text-end">ACTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1092') }}" class="text-dark">#ORD-1092</a></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-primary text-white rounded-circle text-center fw-bold" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">SJ</div>
+              <div>
+                <h6 class="mb-0 fw-semibold">Sarah Jenkins</h6>
+                <small class="text-muted">sarah@example.com</small>
+              </div>
+            </div>
+          </td>
+          <td class="text-muted">Aug 24, 2026</td>
+          <td>1 Item</td>
+          <td class="fw-bold">$1,399.00</td>
+          <td><span class="badge bg-light text-dark border">Credit Card</span></td>
+          <td><span class="badge badge-status badge-delivered">Delivered</span></td>
+          <td class="text-end">
+            <a href="{{ url_for('admin_order_detail', order_id='ORD-1092') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1091') }}" class="text-dark">#ORD-1091</a></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-info text-white rounded-circle text-center fw-bold" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">MC</div>
+              <div>
+                <h6 class="mb-0 fw-semibold">Michael Chang</h6>
+                <small class="text-muted">michael@example.com</small>
+              </div>
+            </div>
+          </td>
+          <td class="text-muted">Aug 24, 2026</td>
+          <td>2 Items</td>
+          <td class="fw-bold">$399.00</td>
+          <td><span class="badge bg-light text-dark border">PayPal</span></td>
+          <td><span class="badge badge-status badge-processing">Processing</span></td>
+          <td class="text-end">
+            <a href="{{ url_for('admin_order_detail', order_id='ORD-1091') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1090') }}" class="text-dark">#ORD-1090</a></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-success text-white rounded-circle text-center fw-bold" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">ER</div>
+              <div>
+                <h6 class="mb-0 fw-semibold">Elena Rostova</h6>
+                <small class="text-muted">elena@example.com</small>
+              </div>
+            </div>
+          </td>
+          <td class="text-muted">Aug 23, 2026</td>
+          <td>1 Item</td>
+          <td class="fw-bold">$2,299.00</td>
+          <td><span class="badge bg-light text-dark border">Apple Pay</span></td>
+          <td><span class="badge badge-status badge-shipped">Shipped</span></td>
+          <td class="text-end">
+            <a href="{{ url_for('admin_order_detail', order_id='ORD-1090') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1089') }}" class="text-dark">#ORD-1089</a></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="bg-warning text-dark rounded-circle text-center fw-bold" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">JW</div>
+              <div>
+                <h6 class="mb-0 fw-semibold">James Wilson</h6>
+                <small class="text-muted">james@example.com</small>
+              </div>
+            </div>
+          </td>
+          <td class="text-muted">Aug 23, 2026</td>
+          <td>3 Items</td>
+          <td class="fw-bold">$129.00</td>
+          <td><span class="badge bg-light text-dark border">Cash on Delivery</span></td>
+          <td><span class="badge badge-status badge-pending">Pending</span></td>
+          <td class="text-end">
+            <a href="{{ url_for('admin_order_detail', order_id='ORD-1089') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

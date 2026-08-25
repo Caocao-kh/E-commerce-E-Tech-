@@ -1,0 +1,212 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard | E-Tech Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <h3 class="fw-bold mb-1">Dashboard Overview</h3>
+    <p class="text-muted small mb-0">Welcome back! Here is what's happening with your store today.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('admin_product_new') }}" class="btn btn-primary rounded-pill btn-sm px-3">
+      <i class="bi bi-plus-lg me-1"></i> Add Product
+    </a>
+    <a href="{{ url_for('admin_deals') }}" class="btn btn-outline-dark rounded-pill btn-sm px-3">
+      <i class="bi bi-tag me-1"></i> Create Deal
+    </a>
+  </div>
+</div>
+
+<!-- KPI Cards Grid -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="kpi-card d-flex align-items-center justify-content-between">
+      <div>
+        <span class="text-muted small fw-semibold text-uppercase">Total Sales</span>
+        <h3 class="fw-bold text-dark mb-0">$24,580</h3>
+        <small class="text-success fw-semibold"><i class="bi bi-arrow-up-right"></i> +12.4% vs last month</small>
+      </div>
+      <div class="kpi-icon bg-primary-subtle text-primary">
+        <i class="bi bi-currency-dollar"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="kpi-card d-flex align-items-center justify-content-between">
+      <div>
+        <span class="text-muted small fw-semibold text-uppercase">Total Orders</span>
+        <h3 class="fw-bold text-dark mb-0">1,245</h3>
+        <small class="text-success fw-semibold"><i class="bi bi-arrow-up-right"></i> +8.2% vs last month</small>
+      </div>
+      <div class="kpi-icon bg-info-subtle text-info">
+        <i class="bi bi-bag-check"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="kpi-card d-flex align-items-center justify-content-between">
+      <div>
+        <span class="text-muted small fw-semibold text-uppercase">Total Customers</span>
+        <h3 class="fw-bold text-dark mb-0">3,842</h3>
+        <small class="text-success fw-semibold"><i class="bi bi-arrow-up-right"></i> +15.1% new users</small>
+      </div>
+      <div class="kpi-icon bg-success-subtle text-success">
+        <i class="bi bi-people"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="kpi-card d-flex align-items-center justify-content-between">
+      <div>
+        <span class="text-muted small fw-semibold text-uppercase">Active Products</span>
+        <h3 class="fw-bold text-dark mb-0">186</h3>
+        <small class="text-muted fw-semibold">24 Categories</small>
+      </div>
+      <div class="kpi-icon bg-warning-subtle text-warning">
+        <i class="bi bi-box-seam"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Analytics Charts Section -->
+<div class="row g-4 mb-4">
+  <div class="col-12 col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h5 class="fw-bold mb-0">Revenue Analytics</h5>
+          <small class="text-muted">Monthly sales revenue performance</small>
+        </div>
+        <span class="badge bg-light text-dark border">Year 2026</span>
+      </div>
+      <div class="w-100 overflow-hidden" style="height: 250px;">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h5 class="fw-bold mb-0">Order Volume</h5>
+          <small class="text-muted">Completed orders distribution</small>
+        </div>
+      </div>
+      <div class="w-100 overflow-hidden" style="height: 250px;">
+        <canvas id="ordersChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tables Section -->
+<div class="row g-4">
+  <!-- Recent Orders -->
+  <div class="col-12 col-xl-8">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Recent Orders</h5>
+        <a href="{{ url_for('admin_orders') }}" class="btn btn-link btn-sm text-decoration-none fw-semibold">View All</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle text-nowrap mb-0">
+          <thead class="bg-light small text-muted">
+            <tr>
+              <th>ORDER ID</th>
+              <th>CUSTOMER</th>
+              <th>DATE</th>
+              <th>TOTAL</th>
+              <th>STATUS</th>
+              <th class="text-end">ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1092') }}" class="text-dark">#ORD-1092</a></td>
+              <td>Sarah Jenkins</td>
+              <td class="text-muted">Aug 24, 2026</td>
+              <td class="fw-bold">$1,399.00</td>
+              <td><span class="badge badge-status badge-delivered">Delivered</span></td>
+              <td class="text-end"><a href="{{ url_for('admin_order_detail', order_id='ORD-1092') }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a></td>
+            </tr>
+            <tr>
+              <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1091') }}" class="text-dark">#ORD-1091</a></td>
+              <td>Michael Chang</td>
+              <td class="text-muted">Aug 24, 2026</td>
+              <td class="fw-bold">$399.00</td>
+              <td><span class="badge badge-status badge-processing">Processing</span></td>
+              <td class="text-end"><a href="{{ url_for('admin_order_detail', order_id='ORD-1091') }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a></td>
+            </tr>
+            <tr>
+              <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1090') }}" class="text-dark">#ORD-1090</a></td>
+              <td>Elena Rostova</td>
+              <td class="text-muted">Aug 23, 2026</td>
+              <td class="fw-bold">$2,299.00</td>
+              <td><span class="badge badge-status badge-shipped">Shipped</span></td>
+              <td class="text-end"><a href="{{ url_for('admin_order_detail', order_id='ORD-1090') }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a></td>
+            </tr>
+            <tr>
+              <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1089') }}" class="text-dark">#ORD-1089</a></td>
+              <td>James Wilson</td>
+              <td class="text-muted">Aug 23, 2026</td>
+              <td class="fw-bold">$129.00</td>
+              <td><span class="badge badge-status badge-pending">Pending</span></td>
+              <td class="text-end"><a href="{{ url_for('admin_order_detail', order_id='ORD-1089') }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Low Stock Alert -->
+  <div class="col-12 col-xl-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Low Stock Alert</h5>
+        <span class="badge bg-danger-subtle text-danger">Action Required</span>
+      </div>
+      <div class="d-flex flex-column gap-3">
+        <div class="d-flex align-items-center justify-content-between p-2 rounded-3 border bg-light">
+          <div class="d-flex align-items-center gap-2">
+            <img src="https://images.unsplash.com/photo-1510127034890-ba27508e9f1c" class="rounded-3" style="width: 40px; height: 40px; object-fit: cover;" alt="Camera">
+            <div>
+              <h6 class="mb-0 text-truncate fw-semibold" style="max-width: 150px;">Sony Alpha A7 IV</h6>
+              <small class="text-muted">Cameras</small>
+            </div>
+          </div>
+          <span class="badge bg-danger">8 units left</span>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between p-2 rounded-3 border bg-light">
+          <div class="d-flex align-items-center gap-2">
+            <img src="https://images.unsplash.com/photo-1603302576837-37561b2e2302" class="rounded-3" style="width: 40px; height: 40px; object-fit: cover;" alt="Laptop">
+            <div>
+              <h6 class="mb-0 text-truncate fw-semibold" style="max-width: 150px;">Lenovo Legion 7</h6>
+              <small class="text-muted">Laptops</small>
+            </div>
+          </div>
+          <span class="badge bg-danger">10 units left</span>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between p-2 rounded-3 border bg-light">
+          <div class="d-flex align-items-center gap-2">
+            <img src="https://images.unsplash.com/photo-1606813907291-d86efa9b94db" class="rounded-3" style="width: 40px; height: 40px; object-fit: cover;" alt="PS5">
+            <div>
+              <h6 class="mb-0 text-truncate fw-semibold" style="max-width: 150px;">PlayStation 5 Pro</h6>
+              <small class="text-muted">Gaming</small>
+            </div>
+          </div>
+          <span class="badge bg-warning text-dark">10 units left</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Order Details #{{ order_id }} | E-Tech Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <div class="d-flex align-items-center gap-2">
+      <h3 class="fw-bold mb-0">Order #{{ order_id }}</h3>
+      <span class="badge badge-status badge-processing fs-6">Processing</span>
+    </div>
+    <p class="text-muted small mb-0">Placed on August 24, 2026 at 14:32 PM</p>
+  </div>
+  <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-secondary rounded-pill px-3">
+    <i class="bi bi-arrow-left me-1"></i> Back to Orders
+  </a>
+</div>
+
+<div class="row g-4">
+  <!-- Left Side: Order Items Table -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+      <h5 class="fw-bold mb-3">Order Items</h5>
+      <div class="table-responsive">
+        <table class="table align-middle text-nowrap">
+          <thead class="bg-light small text-muted">
+            <tr>
+              <th>PRODUCT</th>
+              <th>PRICE</th>
+              <th class="text-center">QTY</th>
+              <th class="text-end">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <img src="https://images.unsplash.com/photo-1592899677977-9c10ca588bbd" class="rounded-3 object-fit-cover" style="width: 54px; height: 54px;" alt="iPhone">
+                  <div>
+                    <h6 class="fw-bold mb-0">iPhone 17 Pro Max</h6>
+                    <small class="text-muted">Color: Black Titanium | Storage: 256GB</small>
+                  </div>
+                </div>
+              </td>
+              <td>$1,399.00</td>
+              <td class="text-center">1</td>
+              <td class="text-end fw-bold">$1,399.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="my-3">
+
+      <div class="row justify-content-end">
+        <div class="col-md-6">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Subtotal</span>
+            <span class="fw-bold">$1,399.00</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Shipping Fee</span>
+            <span class="text-success fw-bold">FREE</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Tax / VAT (10%)</span>
+            <span>$139.90</span>
+          </div>
+          <hr class="my-2">
+          <div class="d-flex justify-content-between fs-5 fw-bold text-dark">
+            <span>Grand Total</span>
+            <span>$1,538.90</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fulfillment Status Update -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+      <h5 class="fw-bold mb-3">Update Order Status</h5>
+      <form onsubmit="event.preventDefault(); showToast('Order status updated successfully!', 'success');">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-8">
+            <select class="form-select">
+              <option value="pending">Pending Payment</option>
+              <option value="processing" selected>Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <button type="submit" class="btn btn-primary rounded-pill w-100">Update Status</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right Side: Customer & Delivery Info -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+      <h5 class="fw-bold mb-3">Customer Profile</h5>
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="bg-primary text-white rounded-circle text-center fw-bold fs-5" style="width: 48px; height: 48px; line-height: 48px;">SJ</div>
+        <div>
+          <h6 class="fw-bold mb-0">Sarah Jenkins</h6>
+          <small class="text-muted">Customer since 2024</small>
+        </div>
+      </div>
+      <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
+        <li><i class="bi bi-envelope me-2"></i>sarah.jenkins@example.com</li>
+        <li><i class="bi bi-telephone me-2"></i>+1 (555) 019-2834</li>
+        <li><i class="bi bi-bag-check me-2"></i>14 Lifetime Orders</li>
+      </ul>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+      <h5 class="fw-bold mb-3">Shipping Address</h5>
+      <p class="text-secondary small mb-0">
+        <strong>Sarah Jenkins</strong><br>
+        123 Technology Boulevard, Suite 400<br>
+        Phnom Penh, Cambodia 12000<br>
+        Phone: +855 12 345 678
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

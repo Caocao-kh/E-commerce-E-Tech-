@@ -1,0 +1,26 @@
+/* Cart & Wishlist Styles */
+.cart-page, .wishlist-page {
+  padding: 3rem 0;
+}
+
+.empty-cart, .empty-wishlist {
+  padding: 4rem 1rem;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.empty-icon i {
+  font-size: 4rem;
+  opacity: 0.4;
+}
+
+.cart-table th {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.cart-summary-card {
+  position: sticky;
+  top: 100px;
+}

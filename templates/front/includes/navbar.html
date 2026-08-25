@@ -1,0 +1,77 @@
+<nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom etech-navbar py-2 shadow-sm">
+  <div class="container">
+
+    <!-- Logo -->
+    <a class="navbar-brand etech-logo fw-bold fs-4 text-dark d-flex align-items-center" href="{{ url_for('home') }}">
+      <span class="bg-dark text-white rounded-3 px-2 py-1 me-1 fs-5">E</span>-Tech
+    </a>
+
+    <!-- Mobile Action Buttons & Toggler -->
+    <div class="d-flex align-items-center d-lg-none ms-auto me-2">
+      <a href="{{ url_for('wishlist') }}" class="btn btn-link text-dark position-relative p-2 me-1" title="Wishlist">
+        <i class="bi bi-heart fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger wishlist-count" style="font-size: 0.65rem;">0</span>
+      </a>
+      <a href="{{ url_for('cart') }}" class="btn btn-link text-dark position-relative p-2" title="Cart">
+        <i class="bi bi-bag fs-5"></i>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark cart-count" style="font-size: 0.65rem;">0</span>
+      </a>
+    </div>
+
+    <button
+      class="navbar-toggler border-0 p-2"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <i class="bi bi-list fs-3"></i>
+    </button>
+
+    <!-- Navigation Menu -->
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0 fw-medium">
+        <li class="nav-item me-2">
+          <a class="nav-link px-3 {{ 'active text-primary fw-bold' if module == 'home' else '' }}" href="{{ url_for('home') }}">Home</a>
+        </li>
+        <li class="nav-item me-2">
+          <a class="nav-link px-3 {{ 'active text-primary fw-bold' if module == 'products' else '' }}" href="{{ url_for('product_list') }}">Shop</a>
+        </li>
+        <li class="nav-item me-2">
+          <a class="nav-link px-3 {{ 'active text-primary fw-bold' if module == 'deals' else '' }}" href="{{ url_for('deals') }}">Deals</a>
+        </li>
+        <li class="nav-item me-2">
+          <a class="nav-link px-3 {{ 'active text-primary fw-bold' if module == 'about' else '' }}" href="{{ url_for('about') }}">About</a>
+        </li>
+      </ul>
+
+      <!-- Search Input Form -->
+      <form method="GET" action="{{ url_for('product_list') }}" class="d-flex me-3 mb-2 mb-lg-0 role-search">
+        <div class="input-group input-group-sm rounded-pill overflow-hidden border">
+          <span class="input-group-text bg-white border-0 ps-3"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" name="q" class="form-control border-0 bg-white" placeholder="Search products..." aria-label="Search">
+        </div>
+      </form>
+
+      <!-- Customer Action Icons -->
+      <div class="d-none d-lg-flex align-items-center gap-2">
+        <a href="{{ url_for('wishlist') }}" class="btn btn-outline-dark border-0 rounded-circle position-relative p-2" title="Wishlist">
+          <i class="bi bi-heart fs-5"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger wishlist-count" style="font-size: 0.65rem;">0</span>
+        </a>
+
+        <a href="{{ url_for('cart') }}" class="btn btn-outline-dark border-0 rounded-circle position-relative p-2" title="Cart">
+          <i class="bi bi-bag fs-5"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark cart-count" style="font-size: 0.65rem;">0</span>
+        </a>
+
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-dark btn-sm rounded-pill px-3 ms-2" title="Admin Portal">
+          <i class="bi bi-speedometer2 me-1"></i> Admin
+        </a>
+      </div>
+
+    </div>
+  </div>
+</nav>

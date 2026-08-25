@@ -1,0 +1,21 @@
+.btn {
+    transition: 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.product-card {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: white;
+}
+
+.category-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: white;
+}

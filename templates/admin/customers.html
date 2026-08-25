@@ -1,0 +1,94 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage Customers | E-Tech Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Customer Directory</h3>
+    <p class="text-muted small mb-0">Manage registered customer accounts and order history.</p>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+  <div class="table-responsive">
+    <table class="table align-middle text-nowrap mb-0">
+      <thead class="bg-light small text-muted">
+        <tr>
+          <th>CUSTOMER</th>
+          <th>EMAIL</th>
+          <th>TOTAL ORDERS</th>
+          <th>TOTAL SPENT</th>
+          <th>JOIN DATE</th>
+          <th>STATUS</th>
+          <th class="text-end">ACTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb" class="rounded-circle object-fit-cover" style="width: 40px; height: 40px;" alt="Sarah">
+              <div>
+                <h6 class="fw-bold mb-0">Sarah Jenkins</h6>
+                <small class="text-muted">Phnom Penh, Cambodia</small>
+              </div>
+            </div>
+          </td>
+          <td>sarah.j@example.com</td>
+          <td>14 Orders</td>
+          <td class="fw-bold text-dark">$4,850.00</td>
+          <td class="text-muted">Jan 12, 2024</td>
+          <td><span class="badge bg-success-subtle text-success">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-secondary rounded-circle" title="Email Customer"><i class="bi bi-envelope"></i></button>
+            <button class="btn btn-sm btn-outline-danger rounded-circle" title="Block Account" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-slash-circle"></i></button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d" class="rounded-circle object-fit-cover" style="width: 40px; height: 40px;" alt="Michael">
+              <div>
+                <h6 class="fw-bold mb-0">Michael Chang</h6>
+                <small class="text-muted">Siem Reap, Cambodia</small>
+              </div>
+            </div>
+          </td>
+          <td>michael.c@example.com</td>
+          <td>8 Orders</td>
+          <td class="fw-bold text-dark">$2,140.00</td>
+          <td class="text-muted">Mar 05, 2024</td>
+          <td><span class="badge bg-success-subtle text-success">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-secondary rounded-circle" title="Email Customer"><i class="bi bi-envelope"></i></button>
+            <button class="btn btn-sm btn-outline-danger rounded-circle" title="Block Account" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-slash-circle"></i></button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2" class="rounded-circle object-fit-cover" style="width: 40px; height: 40px;" alt="Elena">
+              <div>
+                <h6 class="fw-bold mb-0">Elena Rostova</h6>
+                <small class="text-muted">Battambang, Cambodia</small>
+              </div>
+            </div>
+          </td>
+          <td>elena.r@example.com</td>
+          <td>22 Orders</td>
+          <td class="fw-bold text-dark">$9,890.00</td>
+          <td class="text-muted">Nov 18, 2023</td>
+          <td><span class="badge bg-success-subtle text-success">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-secondary rounded-circle" title="Email Customer"><i class="bi bi-envelope"></i></button>
+            <button class="btn btn-sm btn-outline-danger rounded-circle" title="Block Account" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-slash-circle"></i></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

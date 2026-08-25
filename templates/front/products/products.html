@@ -1,0 +1,193 @@
+{% extends "front/index.html" %}
+
+{% block title %}Products Catalog | E-Tech{% endblock %}
+
+{% block content %}
+<section class="products-page py-4">
+  <div class="container">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none text-muted">Home</a></li>
+          <li class="breadcrumb-item active fw-semibold" aria-current="page">Shop Catalog</li>
+        </ol>
+      </nav>
+      <h2 class="fw-bold mb-1">Explore Products</h2>
+      <p class="text-muted">Discover top-tier smartphones, laptops, audio systems & tech gear.</p>
+    </div>
+
+    <!-- Filter & Toolbar Form -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+      <form method="GET" action="{{ url_for('product_list') }}" id="catalog-filter-form">
+        <div class="row g-3 align-items-center">
+
+          <!-- Search Input -->
+          <div class="col-12 col-md-4">
+            <div class="input-group input-group-sm rounded-pill overflow-hidden border">
+              <span class="input-group-text bg-white border-0 ps-3"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" name="q" value="{{ query }}" class="form-control border-0 bg-white" placeholder="Search product name, brand...">
+            </div>
+          </div>
+
+          <!-- Category Select -->
+          <div class="col-6 col-md-2">
+            <select name="category" class="form-select form-select-sm rounded-pill" onchange="this.form.submit()">
+              <option value="">All Categories</option>
+              {% for cat in categories %}
+                <option value="{{ cat }}" {% if selected_category|lower == cat|lower %}selected{% endif %}>{{ cat|title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Brand Select -->
+          <div class="col-6 col-md-2">
+            <select name="brand" class="form-select form-select-sm rounded-pill" onchange="this.form.submit()">
+              <option value="">All Brands</option>
+              {% for b in brands %}
+                <option value="{{ b }}" {% if selected_brand|lower == b|lower %}selected{% endif %}>{{ b }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Min/Max Price Inputs -->
+          <div class="col-6 col-md-2">
+            <div class="input-group input-group-sm rounded-pill overflow-hidden border">
+              <span class="input-group-text bg-white border-0 text-muted px-2">$</span>
+              <input type="number" name="min_price" value="{{ selected_min_price }}" class="form-control border-0 bg-white" placeholder="Min">
+              <input type="number" name="max_price" value="{{ selected_max_price }}" class="form-control border-0 bg-white border-start" placeholder="Max">
+            </div>
+          </div>
+
+          <!-- Sort Select -->
+          <div class="col-6 col-md-2">
+            <select name="sort" class="form-select form-select-sm rounded-pill" onchange="this.form.submit()">
+              <option value="default" {% if selected_sort == 'default' %}selected{% endif %}>Sort: Default</option>
+              <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest First</option>
+              <option value="price_low" {% if selected_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+              <option value="price_high" {% if selected_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+              <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top small text-muted">
+          <div>
+            Found <strong>{{ products|length }}</strong> products
+            {% if query %} for "<strong>{{ query }}</strong>"{% endif %}
+            {% if selected_category %} in <strong>{{ selected_category|title }}</strong>{% endif %}
+          </div>
+          <div>
+            <a href="{{ url_for('product_list') }}" class="text-danger text-decoration-none">
+              <i class="bi bi-x-circle me-1"></i> Reset Filters
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Product Grid -->
+    {% if products %}
+      <div class="row g-4">
+        {% for product in products %}
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card position-relative bg-white">
+              
+              <!-- Badges -->
+              <div class="position-absolute top-0 start-0 m-3 z-1">
+                {% if product.get("isNew") %}
+                  <span class="badge bg-dark rounded-pill px-3 py-2">NEW</span>
+                {% elif product.get("oldPrice", 0) > product.get("price", 0) %}
+                  <span class="badge bg-danger rounded-pill px-3 py-2">
+                    -{{ ((1 - product.price / product.oldPrice) * 100)|round|int }}%
+                  </span>
+                {% endif %}
+              </div>
+
+              <!-- Wishlist Trigger -->
+              <button 
+                class="btn btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-3 z-1 wishlist"
+                data-wishlist-id="{{ product.id }}"
+                data-title="{{ product.title }}"
+                data-price="{{ product.price }}"
+                data-old-price="{{ product.get('oldPrice', 0) }}"
+                data-image="{{ product.image }}"
+                data-category="{{ product.category }}"
+                title="Add to Wishlist"
+              >
+                <i class="bi bi-heart fs-6"></i>
+              </button>
+
+              <!-- Image -->
+              <a href="{{ url_for('product_detail', product_id=product.id) }}" class="overflow-hidden bg-light d-block text-center position-relative">
+                <img 
+                  src="{{ product.image }}" 
+                  alt="{{ product.title }}" 
+                  class="card-img-top object-fit-cover transition-transform"
+                  style="height: 220px;"
+                  loading="lazy"
+                  onerror="this.onerror=null;this.src='https://via.placeholder.com/400x300?text=E-Tech';"
+                >
+              </a>
+
+              <!-- Info -->
+              <div class="card-body d-flex flex-column p-3">
+                <div class="text-uppercase text-muted small fw-semibold mb-1">{{ product.category }}</div>
+                <h6 class="card-title fw-bold mb-2 text-truncate">
+                  <a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-dark text-decoration-none">{{ product.title }}</a>
+                </h6>
+
+                <div class="d-flex align-items-center gap-1 text-warning small mb-3">
+                  <i class="bi bi-star-fill"></i>
+                  <span class="fw-bold text-dark">{{ product.rating }}</span>
+                  <span class="text-muted">(95)</span>
+                </div>
+
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="fw-bold text-dark fs-5">${{ "%.2f"|format(product.price) }}</span>
+                    {% if product.get("oldPrice", 0) > product.price %}
+                      <small class="text-muted text-decoration-line-through ms-1">${{ "%.2f"|format(product.oldPrice) }}</small>
+                    {% endif %}
+                  </div>
+                  <button 
+                    class="btn btn-dark rounded-circle p-2 d-flex align-items-center justify-content-center add-cart"
+                    style="width: 40px; height: 40px;"
+                    data-cart-id="{{ product.id }}"
+                    data-title="{{ product.title }}"
+                    data-price="{{ product.price }}"
+                    data-old-price="{{ product.get('oldPrice', 0) }}"
+                    data-image="{{ product.image }}"
+                    data-category="{{ product.category }}"
+                    title="Add to Cart"
+                  >
+                    <i class="bi bi-bag-plus fs-5"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Empty Catalog State -->
+      <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-5 bg-white">
+        <div class="mb-3 text-muted">
+          <i class="bi bi-search display-1"></i>
+        </div>
+        <h4 class="fw-bold mb-2">No products match your filter</h4>
+        <p class="text-muted mb-4">Try clearing search terms or selecting a different category.</p>
+        <div>
+          <a href="{{ url_for('product_list') }}" class="btn btn-dark rounded-pill px-4">
+            Reset Filters
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

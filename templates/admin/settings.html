@@ -1,0 +1,97 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Store Settings | E-Tech Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Store Configuration</h3>
+    <p class="text-muted small mb-0">Manage general store information, branding aesthetics, and alert preferences.</p>
+  </div>
+</div>
+
+<form onsubmit="event.preventDefault(); showToast('Store settings saved successfully!', 'success');">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <!-- Store Settings Card -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+        <h5 class="fw-bold mb-3"><i class="bi bi-shop me-2 text-primary"></i>General Store Settings</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Store Name</label>
+            <input type="text" class="form-control" value="E-Tech Electronics Store">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Support Email</label>
+            <input type="email" class="form-control" value="support@etech-store.com">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Contact Phone</label>
+            <input type="text" class="form-control" value="+855 (0) 23 888 999">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Store Currency</label>
+            <select class="form-select">
+              <option value="USD" selected>USD ($)</option>
+              <option value="KHR">KHR (៛)</option>
+              <option value="EUR">EUR (€)</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Physical Address</label>
+            <input type="text" class="form-control" value="Building 45, Monivong Blvd, Phnom Penh, Cambodia">
+          </div>
+        </div>
+      </div>
+
+      <!-- Appearance Card -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <h5 class="fw-bold mb-3"><i class="bi bi-palette me-2 text-primary"></i>Branding & Appearance</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Primary Accent Color</label>
+            <div class="d-flex gap-2">
+              <input type="color" class="form-control form-control-color" value="#4f46e5" title="Choose color">
+              <input type="text" class="form-control" value="#4f46e5">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Admin Theme Mode</label>
+            <select class="form-select">
+              <option value="light" selected>Light Mode (Default)</option>
+              <option value="dark">Dark Slate</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Notifications Toggles -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <h5 class="fw-bold mb-3"><i class="bi bi-bell me-2 text-primary"></i>Notification Alerts</h5>
+        
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="notifyOrder" checked>
+          <label class="form-check-label fw-semibold" for="notifyOrder">New Order Emails</label>
+          <small class="text-muted d-block">Receive instant alert when a customer purchases.</small>
+        </div>
+
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="notifyStock" checked>
+          <label class="form-check-label fw-semibold" for="notifyStock">Low Stock Alerts</label>
+          <small class="text-muted d-block">Warn when product inventory drops below 10.</small>
+        </div>
+
+        <div class="form-check form-switch mb-4">
+          <input class="form-check-input" type="checkbox" id="notifyUser" checked>
+          <label class="form-check-label fw-semibold" for="notifyUser">User Registrations</label>
+          <small class="text-muted d-block">Digest report of new user signups.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary rounded-pill w-100 shadow-sm">Save All Settings</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

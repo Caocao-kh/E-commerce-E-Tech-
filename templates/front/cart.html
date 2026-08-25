@@ -1,0 +1,86 @@
+{% extends "front/index.html" %}
+
+{% block title %}Shopping Cart | E-Tech{% endblock %}
+
+{% block content %}
+<section class="cart-page py-5">
+  <div class="container">
+
+    <div class="mb-4">
+      <h2 class="fw-bold mb-1"><i class="bi bi-bag me-2"></i>Shopping Cart</h2>
+      <p class="text-muted">Review items in your cart and proceed to checkout.</p>
+    </div>
+
+    <div class="row g-4">
+      <!-- Items Column -->
+      <div class="col-lg-8" id="cart-items-container">
+        <!-- Rendered dynamically by cart.js -->
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading cart...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary Column -->
+      <div class="col-lg-4" id="cart-summary-container">
+        <!-- Rendered dynamically by cart.js -->
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Mock Checkout Modal -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h5 class="modal-header-title fw-bold" id="checkoutModalLabel">
+          <i class="bi bi-shield-lock text-primary me-2"></i>Complete Demo Order
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="checkout-form" onsubmit="event.preventDefault(); bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide(); clearCart(); showToast('Order placed successfully! (Demo)', 'success');">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Full Name</label>
+              <input type="text" class="form-control" value="John Doe" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Email Address</label>
+              <input type="email" class="form-control" value="john@example.com" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Shipping Address</label>
+              <input type="text" class="form-control" value="123 Technology Way, Suite 400" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">City</label>
+              <input type="text" class="form-control" value="Phnom Penh" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Payment Method</label>
+              <select class="form-select">
+                <option value="card">Credit / Debit Card</option>
+                <option value="cod">Cash on Delivery</option>
+                <option value="aba">ABA PAY / Bakong QR</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="alert alert-info border-0 rounded-3 mt-4 small mb-0">
+            <i class="bi bi-info-circle me-1"></i> This is a client-side frontend demo. No actual payment processing or real charge will occur.
+          </div>
+
+          <div class="mt-4 text-end">
+            <button type="button" class="btn btn-outline-secondary rounded-pill me-2 px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-dark rounded-pill px-4">Place Order</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

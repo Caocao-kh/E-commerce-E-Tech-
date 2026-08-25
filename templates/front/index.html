@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}E-Tech | Modern Electronics & Gadgets{% endblock %}</title>
+  <meta name="description" content="E-Tech - Your premium destination for smartphones, laptops, audio, accessories, and tech gear.">
+  
+  <!-- All CSS -->
+  {% include 'front/includes/styles.html' %}
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navbar -->
+  {% include 'front/includes/navbar.html' %}
+
+  <!-- Page Main Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  {% include 'front/includes/footer.html' %}
+
+  <!-- All JavaScript -->
+  {% include 'front/includes/scripts.html' %}
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

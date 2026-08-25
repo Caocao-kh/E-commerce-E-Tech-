@@ -1,0 +1,225 @@
+{% extends "front/index.html" %}
+
+{% block title %}{{ product.title }} | E-Tech{% endblock %}
+
+{% block content %}
+<section class="product-detail-page py-5">
+  <div class="container">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none text-muted">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('product_list') }}" class="text-decoration-none text-muted">Shop</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('product_list') }}?category={{ product.category }}" class="text-decoration-none text-muted">{{ product.category|title }}</a></li>
+        <li class="breadcrumb-item active fw-semibold" aria-current="page">{{ product.title }}</li>
+      </ol>
+    </nav>
+
+    <div class="row g-5 bg-white rounded-4 shadow-sm p-4 p-md-5 mb-5 border">
+      
+      <!-- Gallery Column -->
+      <div class="col-lg-6">
+        <div class="position-relative text-center bg-light rounded-4 p-4 mb-3 border">
+          <img 
+            id="main-detail-image" 
+            src="{{ product.image }}" 
+            alt="{{ product.title }}" 
+            class="img-fluid rounded-3 object-fit-cover shadow-sm"
+            style="max-height: 400px; width: 100%; object-fit: contain;"
+            onerror="this.onerror=null;this.src='https://via.placeholder.com/600x450?text=E-Tech+Product';"
+          >
+          {% if product.get("isNew") %}
+            <span class="position-absolute top-0 start-0 m-3 badge bg-dark rounded-pill px-3 py-2">NEW ARRIVAL</span>
+          {% endif %}
+        </div>
+
+        <!-- Thumbnails -->
+        <div class="d-flex gap-3 justify-content-center overflow-auto py-2">
+          <img src="{{ product.image }}" class="rounded-3 border border-2 border-primary thumbnail-img cursor-pointer object-fit-cover" style="width: 70px; height: 70px;" alt="Thumb 1">
+          <img src="https://images.unsplash.com/photo-1546435770-a3e426bf472b" class="rounded-3 border thumbnail-img cursor-pointer object-fit-cover" style="width: 70px; height: 70px;" alt="Thumb 2" onerror="this.src='{{ product.image }}'">
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e" class="rounded-3 border thumbnail-img cursor-pointer object-fit-cover" style="width: 70px; height: 70px;" alt="Thumb 3" onerror="this.src='{{ product.image }}'">
+        </div>
+      </div>
+
+      <!-- Detail Info Column -->
+      <div class="col-lg-6 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-secondary-subtle text-secondary text-uppercase px-3 py-2 rounded-pill fw-bold" style="letter-spacing: 1px;">
+              {{ product.category }}
+            </span>
+            <span class="text-muted small">Brand: <strong>{{ product.get("brand", "E-Tech") }}</strong></span>
+          </div>
+
+          <h2 class="fw-bold display-6 mb-2">{{ product.title }}</h2>
+
+          <!-- Rating -->
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="text-warning">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-half"></i>
+            </div>
+            <span class="fw-bold">{{ product.rating }}</span>
+            <span class="text-muted small border-start ps-2">(124 Verified Customer Reviews)</span>
+          </div>
+
+          <!-- Pricing & Savings -->
+          <div class="p-3 bg-light rounded-4 mb-4 border d-flex align-items-center justify-content-between">
+            <div>
+              <span class="display-6 fw-bold text-dark">${{ "%.2f"|format(product.price) }}</span>
+              {% if product.get("oldPrice", 0) > product.price %}
+                <span class="text-muted text-decoration-line-through ms-2 fs-5">${{ "%.2f"|format(product.oldPrice) }}</span>
+              {% endif %}
+            </div>
+            {% if product.get("oldPrice", 0) > product.price %}
+              <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold">
+                Save ${{ "%.2f"|format(product.oldPrice - product.price) }}
+              </span>
+            {% endif %}
+          </div>
+
+          <!-- Stock Status -->
+          <div class="mb-4">
+            {% if product.get("stock", 0) > 0 %}
+              <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fs-6 fw-normal">
+                <i class="bi bi-check-circle-fill me-1"></i> In Stock ({{ product.stock }} units available)
+              </span>
+            {% else %}
+              <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill fs-6 fw-normal">
+                <i class="bi bi-x-circle-fill me-1"></i> Currently Out of Stock
+              </span>
+            {% endif %}
+          </div>
+
+          <p class="text-muted mb-4 fs-6">
+            {{ product.description }}
+          </p>
+
+          <!-- Quantity Picker -->
+          <div class="mb-4">
+            <label class="fw-semibold text-dark mb-2">Quantity:</label>
+            <div class="input-group" style="width: 140px;">
+              <button class="btn btn-outline-secondary" type="button" onclick="const i = document.getElementById('product-qty-input'); if(parseInt(i.value)>1) i.value = parseInt(i.value)-1;">-</button>
+              <input type="text" id="product-qty-input" class="form-control text-center bg-white" value="1" readonly>
+              <button class="btn btn-outline-secondary" type="button" onclick="const i = document.getElementById('product-qty-input'); i.value = parseInt(i.value)+1;">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div>
+          <div class="row g-2 mb-4">
+            <div class="col-8">
+              <button 
+                class="btn btn-dark btn-lg w-100 rounded-pill shadow-sm add-cart"
+                data-cart-id="{{ product.id }}"
+                data-title="{{ product.title }}"
+                data-price="{{ product.price }}"
+                data-old-price="{{ product.get('oldPrice', 0) }}"
+                data-image="{{ product.image }}"
+                data-category="{{ product.category }}"
+              >
+                <i class="bi bi-bag-plus me-2"></i> Add to Cart
+              </button>
+            </div>
+            <div class="col-4">
+              <button 
+                class="btn btn-outline-danger btn-lg w-100 rounded-pill wishlist"
+                data-wishlist-id="{{ product.id }}"
+                data-title="{{ product.title }}"
+                data-price="{{ product.price }}"
+                data-old-price="{{ product.get('oldPrice', 0) }}"
+                data-image="{{ product.image }}"
+                data-category="{{ product.category }}"
+                title="Add to Wishlist"
+              >
+                <i class="bi bi-heart me-1"></i> Wishlist
+              </button>
+            </div>
+          </div>
+
+          <!-- Share UI -->
+          <div class="d-flex align-items-center gap-3 pt-3 border-top text-muted small">
+            <span>Share Product:</span>
+            <a href="#" class="text-muted text-dark-hover"><i class="bi bi-facebook fs-5"></i></a>
+            <a href="#" class="text-muted text-dark-hover"><i class="bi bi-twitter-x fs-5"></i></a>
+            <a href="#" class="text-muted text-dark-hover"><i class="bi bi-pinterest fs-5"></i></a>
+            <a href="#" class="text-muted text-dark-hover"><i class="bi bi-link-45deg fs-4" onclick="showToast('Product link copied to clipboard!', 'info'); return false;"></i></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Specifications Table -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5 bg-white">
+      <h4 class="fw-bold mb-4">Product Specifications</h4>
+      <div class="table-responsive">
+        <table class="table table-striped align-middle">
+          <tbody>
+            <tr>
+              <th style="width: 250px;" class="text-muted">Brand</th>
+              <td>{{ product.get("brand", "Apple / General") }}</td>
+            </tr>
+            <tr>
+              <th class="text-muted">Category</th>
+              <td>{{ product.category|title }}</td>
+            </tr>
+            {% if product.get("size") %}
+            <tr>
+              <th class="text-muted">Display / Size</th>
+              <td>{{ product.size }}</td>
+            </tr>
+            {% endif %}
+            {% if product.get("storage") %}
+            <tr>
+              <th class="text-muted">Storage Options</th>
+              <td>{{ product.storage|join(", ") if product.storage is iterable and product.storage is not string else product.storage }}</td>
+            </tr>
+            {% endif %}
+            {% if product.get("color") %}
+            <tr>
+              <th class="text-muted">Colors</th>
+              <td>{{ product.color|join(", ") if product.color is iterable and product.color is not string else product.color }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <th class="text-muted">Warranty</th>
+              <td>1 Year Official E-Tech Warranty</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="mb-4">
+      <h4 class="fw-bold mb-4">Related Products</h4>
+      <div class="row g-4">
+        {% for rel in related_products %}
+          <div class="col-6 col-md-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden product-card bg-white">
+              <a href="{{ url_for('product_detail', product_id=rel.id) }}">
+                <img src="{{ rel.image }}" class="card-img-top object-fit-cover" alt="{{ rel.title }}" style="height: 180px;">
+              </a>
+              <div class="card-body p-3">
+                <h6 class="fw-bold text-truncate mb-1">
+                  <a href="{{ url_for('product_detail', product_id=rel.id) }}" class="text-dark text-decoration-none">{{ rel.title }}</a>
+                </h6>
+                <div class="fw-bold text-primary">${{ "%.2f"|format(rel.price) }}</div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

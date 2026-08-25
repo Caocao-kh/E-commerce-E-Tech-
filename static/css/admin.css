@@ -1,0 +1,175 @@
+/* Admin Dashboard Layout Styles */
+#admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f1f5f9;
+}
+
+#admin-sidebar {
+  width: 260px;
+  background-color: #0f172a;
+  color: #f8fafc;
+  flex-shrink: 0;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  z-index: 1040;
+}
+
+#admin-wrapper.sidebar-collapsed #admin-sidebar {
+  margin-left: -260px;
+}
+
+.sidebar-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.sidebar-menu .nav-item {
+  margin-bottom: 2px;
+}
+
+.sidebar-menu .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: #94a3b8;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.sidebar-menu .nav-link i {
+  font-size: 1.2rem;
+  margin-right: 0.85rem;
+  width: 24px;
+  text-align: center;
+}
+
+.sidebar-menu .nav-link:hover,
+.sidebar-menu .nav-link.active {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-left: 4px solid #4f46e5;
+}
+
+#admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-topbar {
+  background-color: #ffffff;
+  height: 64px;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.admin-content {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+/* KPI Cards */
+.kpi-card {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #e2e8f0;
+}
+
+.kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Status Badges */
+.badge-status {
+  padding: 0.35em 0.7em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 50rem;
+  text-transform: capitalize;
+}
+
+.badge-pending { background-color: #fef3c7; color: #d97706; }
+.badge-processing { background-color: #e0f2fe; color: #0284c7; }
+.badge-shipped { background-color: #e0e7ff; color: #4338ca; }
+.badge-delivered { background-color: #dcfce7; color: #15803d; }
+.badge-cancelled { background-color: #fee2e2; color: #b91c1c; }
+
+/* Timeline for Order Detail */
+.order-timeline {
+  position: relative;
+  padding-left: 2rem;
+  list-style: none;
+}
+
+.order-timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 5px;
+  bottom: 5px;
+  width: 2px;
+  background-color: #e2e8f0;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -2rem;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: 3px solid #ffffff;
+}
+
+.timeline-item.active .timeline-dot {
+  background: #4f46e5;
+}
+
+/* Category Icon Box */
+.category-icon-box {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+}
+
+/* Mobile Responsive Adjustments */
+
+@media (max-width: 991.98px) {
+  #admin-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    margin-left: -260px;
+  }
+  
+  #admin-wrapper.sidebar-collapsed #admin-sidebar {
+    margin-left: 0;
+  }
+}

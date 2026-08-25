@@ -1,0 +1,86 @@
+<footer class="bg-dark text-white pt-5 pb-4 mt-auto">
+  <div class="container">
+    <div class="row g-4 mb-4">
+      
+      <!-- Brand & Social -->
+      <div class="col-12 col-md-4">
+        <a class="navbar-brand etech-logo fw-bold fs-4 text-white d-flex align-items-center mb-3" href="{{ url_for('home') }}">
+          <span class="bg-white text-dark rounded-3 px-2 py-1 me-1 fs-5">E</span>-Tech
+        </a>
+        <p class="text-secondary small mb-3" style="max-width: 320px;">
+          Your reliable online destination for cutting-edge electronics, smartphones, laptops, audio gear, and lifestyle technology.
+        </p>
+        <div class="d-flex gap-3 text-secondary fs-5">
+          <a href="#" class="text-secondary text-white-hover"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="text-secondary text-white-hover"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="text-secondary text-white-hover"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="text-secondary text-white-hover"><i class="bi bi-youtube"></i></a>
+        </div>
+      </div>
+
+      <!-- Shop Navigation -->
+      <div class="col-6 col-md-2">
+        <h6 class="fw-bold mb-3 text-white text-uppercase small" style="letter-spacing: 1px;">Shop</h6>
+        <ul class="list-unstyled text-secondary small d-flex flex-column gap-2">
+          <li><a href="{{ url_for('product_list') }}" class="text-secondary text-white-hover">All Products</a></li>
+          <li><a href="{{ url_for('deals') }}" class="text-secondary text-white-hover">Deals & Offers</a></li>
+          <li><a href="{{ url_for('product_list') }}?sort=newest" class="text-secondary text-white-hover">New Arrivals</a></li>
+          <li><a href="{{ url_for('product_list') }}?category=smartphones" class="text-secondary text-white-hover">Smartphones</a></li>
+          <li><a href="{{ url_for('product_list') }}?category=laptops" class="text-secondary text-white-hover">Laptops</a></li>
+        </ul>
+      </div>
+
+      <!-- Company Links -->
+      <div class="col-6 col-md-2">
+        <h6 class="fw-bold mb-3 text-white text-uppercase small" style="letter-spacing: 1px;">Company</h6>
+        <ul class="list-unstyled text-secondary small d-flex flex-column gap-2">
+          <li><a href="{{ url_for('about') }}" class="text-secondary text-white-hover">About E-Tech</a></li>
+          <li><a href="#" class="text-secondary text-white-hover">Careers</a></li>
+          <li><a href="#" class="text-secondary text-white-hover">Store Locations</a></li>
+          <li><a href="#" class="text-secondary text-white-hover">News & Blog</a></li>
+          <li><a href="#" class="text-secondary text-white-hover">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Support & Help -->
+      <div class="col-6 col-md-2">
+        <h6 class="fw-bold mb-3 text-white text-uppercase small" style="letter-spacing: 1px;">Support</h6>
+        <ul class="list-unstyled text-secondary small d-flex flex-column gap-2">
+          <li><a href="#" class="text-secondary text-white-hover">Customer Help</a></li>
+          <li><a href="#" class="text-secondary text-white-hover">Shipping & Delivery</a></li>
+          <li><a href="#" class="text-secondary text-white-hover">Returns Policy</a></li>
+          <li><a href="#" class="text-secondary text-white-hover">Warranty Info</a></li>
+          <li><a href="#" class="text-secondary text-white-hover">Privacy & Terms</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter Box -->
+      <div class="col-12 col-md-2">
+        <h6 class="fw-bold mb-3 text-white text-uppercase small" style="letter-spacing: 1px;">Stay Updated</h6>
+        <p class="text-secondary small mb-2">Get exclusive discounts & promo updates.</p>
+        <form class="newsletter-form">
+          <div class="input-group input-group-sm mb-2">
+            <input type="email" class="form-control bg-dark text-white border-secondary" placeholder="Your email" required>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i></button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+    <hr class="border-secondary my-4">
+
+    <!-- Bottom Bar -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center text-secondary small gap-3">
+      <div>
+        &copy; 2026 E-Tech Store. All rights reserved. Built with Flask &amp; Vanilla JS.
+      </div>
+      <div class="d-flex gap-3 fs-5 text-secondary">
+        <i class="fab fa-cc-visa" title="Visa"></i>
+        <i class="fab fa-cc-mastercard" title="Mastercard"></i>
+        <i class="fab fa-cc-paypal" title="PayPal"></i>
+        <i class="fab fa-cc-apple-pay" title="Apple Pay"></i>
+      </div>
+    </div>
+  </div>
+</footer>
