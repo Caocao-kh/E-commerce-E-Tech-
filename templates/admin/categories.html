@@ -15,131 +15,48 @@
 
 <!-- Categories Grid -->
 <div class="row g-4">
-  <div class="col-12 col-md-6 col-lg-4">
-    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-row align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-3">
-        <div class="bg-primary-subtle text-primary p-3 rounded-circle category-icon-box">
-          <i class="bi bi-phone fs-4"></i>
-        </div>
-        <div>
-          <h5 class="fw-bold mb-1">Smartphones</h5>
-          <small class="text-muted">45 Listed Products</small>
-        </div>
-      </div>
-      <div class="dropdown">
-        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" title="Category Actions" aria-label="Category Actions"><i class="bi bi-three-dots-vertical fs-5"></i></button>
-        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#categoryModal"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-          <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-trash me-2"></i>Delete</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12 col-md-6 col-lg-4">
-    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-row align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-3">
-        <div class="bg-success-subtle text-success p-3 rounded-circle category-icon-box">
-          <i class="bi bi-laptop fs-4"></i>
-        </div>
-        <div>
-          <h5 class="fw-bold mb-1">Laptops</h5>
-          <small class="text-muted">32 Listed Products</small>
-        </div>
-      </div>
-      <div class="dropdown">
-        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" title="Category Actions" aria-label="Category Actions"><i class="bi bi-three-dots-vertical fs-5"></i></button>
-        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#categoryModal"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-          <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-trash me-2"></i>Delete</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12 col-md-6 col-lg-4">
-    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-row align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-3">
-        <div class="bg-info-subtle text-info p-3 rounded-circle category-icon-box">
-          <i class="bi bi-headphones fs-4"></i>
-        </div>
-        <div>
-          <h5 class="fw-bold mb-1">Audio</h5>
-          <small class="text-muted">28 Listed Products</small>
+  {% if category_counts %}
+    {% for cat, count in category_counts.items() %}
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-row align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <div class="bg-primary-subtle text-primary p-3 rounded-circle category-icon-box">
+              {% if 'phone' in cat|lower or 'mobile' in cat|lower %}
+                <i class="bi bi-phone fs-4"></i>
+              {% elif 'laptop' in cat|lower or 'computer' in cat|lower %}
+                <i class="bi bi-laptop fs-4"></i>
+              {% elif 'audio' in cat|lower or 'headphone' in cat|lower %}
+                <i class="bi bi-headphones fs-4"></i>
+              {% elif 'tablet' in cat|lower or 'ipad' in cat|lower %}
+                <i class="bi bi-tablet fs-4"></i>
+              {% elif 'gaming' in cat|lower or 'console' in cat|lower %}
+                <i class="bi bi-controller fs-4"></i>
+              {% else %}
+                <i class="bi bi-box-seam fs-4"></i>
+              {% endif %}
+            </div>
+            <div>
+              <h5 class="fw-bold mb-1">{{ cat }}</h5>
+              <small class="text-muted">{{ count }} Listed Product{% if count != 1 %}s{% endif %}</small>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" title="Category Actions" aria-label="Category Actions"><i class="bi bi-three-dots-vertical fs-5"></i></button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+              <li><a class="dropdown-item" href="{{ url_for('product_list') }}?category={{ cat }}" target="_blank"><i class="bi bi-eye me-2"></i>View Products</a></li>
+              <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-trash me-2"></i>Delete</a></li>
+            </ul>
+          </div>
         </div>
       </div>
-      <div class="dropdown">
-        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" title="Category Actions" aria-label="Category Actions"><i class="bi bi-three-dots-vertical fs-5"></i></button>
-        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#categoryModal"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-          <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-trash me-2"></i>Delete</a></li>
-        </ul>
+    {% endfor %}
+  {% else %}
+    <div class="col-12">
+      <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+        <p class="text-muted">No categories registered yet.</p>
       </div>
     </div>
-  </div>
-
-  <div class="col-12 col-md-6 col-lg-4">
-    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-row align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-3">
-        <div class="bg-warning-subtle text-warning p-3 rounded-circle category-icon-box">
-          <i class="bi bi-smartwatch fs-4"></i>
-        </div>
-        <div>
-          <h5 class="fw-bold mb-1">Smartwatches</h5>
-          <small class="text-muted">18 Listed Products</small>
-        </div>
-      </div>
-      <div class="dropdown">
-        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" title="Category Actions" aria-label="Category Actions"><i class="bi bi-three-dots-vertical fs-5"></i></button>
-        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#categoryModal"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-          <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-trash me-2"></i>Delete</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12 col-md-6 col-lg-4">
-    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-row align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-3">
-        <div class="bg-danger-subtle text-danger p-3 rounded-circle category-icon-box">
-          <i class="bi bi-tablet fs-4"></i>
-        </div>
-        <div>
-          <h5 class="fw-bold mb-1">Tablets</h5>
-          <small class="text-muted">22 Listed Products</small>
-        </div>
-      </div>
-      <div class="dropdown">
-        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" title="Category Actions" aria-label="Category Actions"><i class="bi bi-three-dots-vertical fs-5"></i></button>
-        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#categoryModal"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-          <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-trash me-2"></i>Delete</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12 col-md-6 col-lg-4">
-    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white d-flex flex-row align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-3">
-        <div class="bg-secondary-subtle text-secondary p-3 rounded-circle category-icon-box">
-          <i class="bi bi-controller fs-4"></i>
-        </div>
-        <div>
-          <h5 class="fw-bold mb-1">Gaming</h5>
-          <small class="text-muted">16 Listed Products</small>
-        </div>
-      </div>
-      <div class="dropdown">
-        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" title="Category Actions" aria-label="Category Actions"><i class="bi bi-three-dots-vertical fs-5"></i></button>
-        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#categoryModal"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-          <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-trash me-2"></i>Delete</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
+  {% endif %}
 </div>
 
 <!-- Modal for Add/Edit Category -->
@@ -147,18 +64,19 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg rounded-4 p-3">
       <div class="modal-header border-bottom-0">
-        <h5 class="modal-title fw-bold">Add / Edit Category</h5>
+        <h5 class="modal-title fw-bold">Add New Category</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form onsubmit="event.preventDefault(); bootstrap.Modal.getInstance(document.getElementById('categoryModal')).hide(); showToast('Category saved!', 'success');">
+        <form method="POST" action="{{ url_for('admin_categories') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
           <div class="mb-3">
             <label class="form-label fw-semibold">Category Name</label>
-            <input type="text" class="form-control" placeholder="e.g. Smart Home" required>
+            <input type="text" name="name" class="form-control" placeholder="e.g. Smart Home" required>
           </div>
           <div class="mb-3">
             <label class="form-label fw-semibold">Category Icon (Bootstrap Icon Class)</label>
-            <input type="text" class="form-control" placeholder="e.g. bi-house-door" value="bi-box">
+            <input type="text" name="icon" class="form-control" placeholder="e.g. bi-house-door" value="bi-box">
           </div>
           <div class="text-end mt-4">
             <button type="button" class="btn btn-light rounded-pill me-2 px-3" data-bs-dismiss="modal">Cancel</button>

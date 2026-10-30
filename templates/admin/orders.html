@@ -3,127 +3,225 @@
 {% block title %}Manage Orders | E-Tech Admin{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
   <div>
     <h3 class="fw-bold mb-1">Customer Orders</h3>
-    <p class="text-muted small mb-0">Track order statuses, customer fulfillment, and invoice totals.</p>
+    <p class="text-muted small mb-0">Track real-time orders from customer buyers, fulfillment statuses, and invoices.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('home') }}" target="_blank" class="btn btn-outline-dark rounded-pill btn-sm px-3">
+      <i class="bi bi-box-arrow-up-right me-1"></i> Storefront
+    </a>
   </div>
 </div>
 
-<!-- Order Filter Tabs -->
+<!-- Search & Filter Card -->
 <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
-  <div class="d-flex flex-wrap gap-2">
-    <button class="btn btn-dark rounded-pill btn-sm px-3">All Orders (1,245)</button>
-    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Pending (12)</button>
-    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Processing (45)</button>
-    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Shipped (89)</button>
-    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Delivered (1,080)</button>
-    <button class="btn btn-outline-secondary rounded-pill btn-sm px-3">Cancelled (19)</button>
+  <div class="row g-3 align-items-center">
+    <!-- Status Filter Pills -->
+    <div class="col-12 col-xl-8">
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('admin_orders', q=search_query if search_query else None) }}" 
+           class="btn rounded-pill btn-sm px-3 {{ 'btn-dark' if current_status == 'all' else 'btn-outline-secondary' }}">
+          All Orders ({{ status_counts.all }})
+        </a>
+        <a href="{{ url_for('admin_orders', status='pending', q=search_query if search_query else None) }}" 
+           class="btn rounded-pill btn-sm px-3 {{ 'btn-warning text-dark' if current_status == 'pending' else 'btn-outline-secondary' }}">
+          Pending ({{ status_counts.pending }})
+        </a>
+        <a href="{{ url_for('admin_orders', status='processing', q=search_query if search_query else None) }}" 
+           class="btn rounded-pill btn-sm px-3 {{ 'btn-info text-white' if current_status == 'processing' else 'btn-outline-secondary' }}">
+          Processing ({{ status_counts.processing }})
+        </a>
+        <a href="{{ url_for('admin_orders', status='shipped', q=search_query if search_query else None) }}" 
+           class="btn rounded-pill btn-sm px-3 {{ 'btn-primary' if current_status == 'shipped' else 'btn-outline-secondary' }}">
+          Shipped ({{ status_counts.shipped }})
+        </a>
+        <a href="{{ url_for('admin_orders', status='delivered', q=search_query if search_query else None) }}" 
+           class="btn rounded-pill btn-sm px-3 {{ 'btn-success' if current_status == 'delivered' else 'btn-outline-secondary' }}">
+          Delivered ({{ status_counts.delivered }})
+        </a>
+        <a href="{{ url_for('admin_orders', status='cancelled', q=search_query if search_query else None) }}" 
+           class="btn rounded-pill btn-sm px-3 {{ 'btn-danger' if current_status == 'cancelled' else 'btn-outline-secondary' }}">
+          Cancelled ({{ status_counts.cancelled }})
+        </a>
+      </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="col-12 col-xl-4">
+      <form method="GET" action="{{ url_for('admin_orders') }}" class="d-flex gap-2">
+        {% if current_status and current_status != 'all' %}
+          <input type="hidden" name="status" value="{{ current_status }}">
+        {% endif %}
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" name="q" class="form-control bg-light border-start-0" 
+                 placeholder="Search by order #, buyer, item..." value="{{ search_query or '' }}">
+        </div>
+        <button type="submit" class="btn btn-dark btn-sm rounded-pill px-3">Search</button>
+        {% if search_query %}
+          <a href="{{ url_for('admin_orders', status=current_status if current_status != 'all' else None) }}" 
+             class="btn btn-outline-secondary btn-sm rounded-pill px-2" title="Clear Search">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        {% endif %}
+      </form>
+    </div>
   </div>
 </div>
 
 <!-- Orders Table -->
 <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
-  <div class="table-responsive">
-    <table class="table align-middle text-nowrap mb-0">
-      <thead class="bg-light small text-muted">
-        <tr>
-          <th>ORDER ID</th>
-          <th>CUSTOMER</th>
-          <th>DATE</th>
-          <th>ITEMS</th>
-          <th>TOTAL</th>
-          <th>PAYMENT</th>
-          <th>STATUS</th>
-          <th class="text-end">ACTION</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1092') }}" class="text-dark">#ORD-1092</a></td>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <div class="bg-primary text-white rounded-circle text-center fw-bold" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">SJ</div>
-              <div>
-                <h6 class="mb-0 fw-semibold">Sarah Jenkins</h6>
-                <small class="text-muted">sarah@example.com</small>
-              </div>
-            </div>
-          </td>
-          <td class="text-muted">Aug 24, 2026</td>
-          <td>1 Item</td>
-          <td class="fw-bold">$1,399.00</td>
-          <td><span class="badge bg-light text-dark border">Credit Card</span></td>
-          <td><span class="badge badge-status badge-delivered">Delivered</span></td>
-          <td class="text-end">
-            <a href="{{ url_for('admin_order_detail', order_id='ORD-1092') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
-          </td>
-        </tr>
+  {% if orders and orders|length > 0 %}
+    <div class="table-responsive">
+      <table class="table align-middle text-nowrap mb-0 table-hover">
+        <thead class="bg-light small text-muted text-uppercase">
+          <tr>
+            <th>ORDER ID</th>
+            <th>BUYER / CUSTOMER</th>
+            <th>DATE</th>
+            <th>ITEMS</th>
+            <th>TOTAL</th>
+            <th>PAYMENT</th>
+            <th>STATUS</th>
+            <th class="text-end pe-4">ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+            <tr>
+              <!-- Order ID -->
+              <td class="fw-bold">
+                <a href="{{ url_for('admin_order_detail', order_id=order.order_number) }}" class="text-dark text-decoration-none hover-primary">
+                  #{{ order.order_number }}
+                </a>
+              </td>
 
-        <tr>
-          <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1091') }}" class="text-dark">#ORD-1091</a></td>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <div class="bg-info text-white rounded-circle text-center fw-bold" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">MC</div>
-              <div>
-                <h6 class="mb-0 fw-semibold">Michael Chang</h6>
-                <small class="text-muted">michael@example.com</small>
-              </div>
-            </div>
-          </td>
-          <td class="text-muted">Aug 24, 2026</td>
-          <td>2 Items</td>
-          <td class="fw-bold">$399.00</td>
-          <td><span class="badge bg-light text-dark border">PayPal</span></td>
-          <td><span class="badge badge-status badge-processing">Processing</span></td>
-          <td class="text-end">
-            <a href="{{ url_for('admin_order_detail', order_id='ORD-1091') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
-          </td>
-        </tr>
+              <!-- Customer Details -->
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle text-white text-center fw-bold bg-dark d-flex align-items-center justify-content-center" 
+                       style="width: 36px; height: 36px; font-size: 0.85rem;">
+                    {{ order.customer_name[:2]|upper if order.customer_name else 'CU' }}
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-semibold fs-6">{{ order.customer_name }}</h6>
+                    <small class="text-muted">{{ order.customer_email }}</small>
+                  </div>
+                </div>
+              </td>
 
-        <tr>
-          <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1090') }}" class="text-dark">#ORD-1090</a></td>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <div class="bg-success text-white rounded-circle text-center fw-bold" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">ER</div>
-              <div>
-                <h6 class="mb-0 fw-semibold">Elena Rostova</h6>
-                <small class="text-muted">elena@example.com</small>
-              </div>
-            </div>
-          </td>
-          <td class="text-muted">Aug 23, 2026</td>
-          <td>1 Item</td>
-          <td class="fw-bold">$2,299.00</td>
-          <td><span class="badge bg-light text-dark border">Apple Pay</span></td>
-          <td><span class="badge badge-status badge-shipped">Shipped</span></td>
-          <td class="text-end">
-            <a href="{{ url_for('admin_order_detail', order_id='ORD-1090') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
-          </td>
-        </tr>
+              <!-- Date -->
+              <td>
+                <span class="text-dark fw-medium">
+                  {{ order.created_at.strftime('%b %d, %Y') if order.created_at else 'Recent' }}
+                </span>
+                <small class="text-muted d-block" style="font-size: 0.75rem;">
+                  {{ order.created_at.strftime('%I:%M %p') if order.created_at else '' }}
+                </small>
+              </td>
 
-        <tr>
-          <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1089') }}" class="text-dark">#ORD-1089</a></td>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <div class="bg-warning text-dark rounded-circle text-center fw-bold" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">JW</div>
-              <div>
-                <h6 class="mb-0 fw-semibold">James Wilson</h6>
-                <small class="text-muted">james@example.com</small>
-              </div>
-            </div>
-          </td>
-          <td class="text-muted">Aug 23, 2026</td>
-          <td>3 Items</td>
-          <td class="fw-bold">$129.00</td>
-          <td><span class="badge bg-light text-dark border">Cash on Delivery</span></td>
-          <td><span class="badge badge-status badge-pending">Pending</span></td>
-          <td class="text-end">
-            <a href="{{ url_for('admin_order_detail', order_id='ORD-1089') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+              <!-- Items Summary -->
+              <td>
+                <span class="d-inline-block text-truncate" style="max-width: 220px;" title="{{ order.items_summary }}">
+                  <i class="bi bi-box-seam me-1 text-muted"></i>{{ order.items_summary or '1 Item' }}
+                </span>
+              </td>
+
+              <!-- Total -->
+              <td>
+                <span class="fw-bold text-dark fs-6">${{ "%.2f"|format(order.total_amount) }}</span>
+                {% if order.shipping_fee == 0 %}
+                  <small class="text-success d-block" style="font-size: 0.72rem;">Free Shipping</small>
+                {% else %}
+                  <small class="text-muted d-block" style="font-size: 0.72rem;">+${{ "%.2f"|format(order.shipping_fee) }} ship</small>
+                {% endif %}
+              </td>
+
+              <!-- Payment Method -->
+              <td>
+                <span class="badge bg-light text-dark border">
+                  {{ order.payment_method }}
+                </span>
+              </td>
+
+              <!-- Status Badge -->
+              <td>
+                <span class="badge badge-status badge-{{ order.status|lower }}">
+                  {{ order.status }}
+                </span>
+              </td>
+
+              <!-- Actions -->
+              <td class="text-end pe-4">
+                <div class="d-inline-flex align-items-center gap-1">
+                  <!-- View Details -->
+                  <a href="{{ url_for('admin_order_detail', order_id=order.order_number) }}" 
+                     class="btn btn-sm btn-outline-dark rounded-pill px-3" title="View Order Details">
+                    View
+                  </a>
+
+                  <!-- Quick Status Dropdown -->
+                  <div class="dropdown">
+                    <button class="btn btn-sm btn-light rounded-circle p-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Change Status">
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" style="min-width: 180px;">
+                      <li class="dropdown-header small text-muted text-uppercase fw-bold">Update Status</li>
+                      {% for st in ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"] %}
+                        {% if st != order.status %}
+                          <li>
+                            <form method="POST" action="{{ url_for('admin_order_update_status', order_id=order.order_number) }}">
+                              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                              <input type="hidden" name="status" value="{{ st }}">
+                              <input type="hidden" name="next" value="{{ request.full_path }}">
+                              <button type="submit" class="dropdown-item d-flex align-items-center gap-2 small py-2">
+                                <span class="badge badge-status badge-{{ st|lower }}" style="font-size: 0.65rem;">{{ st }}</span>
+                                Mark as {{ st }}
+                              </button>
+                            </form>
+                          </li>
+                        {% endif %}
+                      {% endfor %}
+                      <li><hr class="dropdown-divider my-1"></li>
+                      <li>
+                        <form method="POST" action="{{ url_for('admin_order_delete', order_id=order.order_number) }}" 
+                              onsubmit="return confirm('Are you sure you want to delete order #{{ order.order_number }}?');">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="dropdown-item text-danger d-flex align-items-center gap-2 small py-2">
+                            <i class="bi bi-trash"></i> Delete Order
+                          </button>
+                        </form>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="text-center py-5 p-4">
+      <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center p-4 mb-3">
+        <i class="bi bi-inbox fs-1 text-muted"></i>
+      </div>
+      <h5 class="fw-bold mb-1">No Orders Found</h5>
+      <p class="text-muted small mb-3">
+        {% if search_query %}
+          No orders match your search term "<strong>{{ search_query }}</strong>".
+        {% elif current_status != 'all' %}
+          There are currently no orders in status "<strong>{{ current_status|title }}</strong>".
+        {% else %}
+          There are no buyer orders placed in the system yet.
+        {% endif %}
+      </p>
+      <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-dark rounded-pill btn-sm px-4">
+        Clear Filter & View All
+      </a>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

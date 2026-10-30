@@ -24,8 +24,8 @@
     <div class="kpi-card d-flex align-items-center justify-content-between">
       <div>
         <span class="text-muted small fw-semibold text-uppercase">Total Sales</span>
-        <h3 class="fw-bold text-dark mb-0">$24,580</h3>
-        <small class="text-success fw-semibold"><i class="bi bi-arrow-up-right"></i> +12.4% vs last month</small>
+        <h3 class="fw-bold text-dark mb-0">${{ "{:,.2f}".format(total_sales) }}</h3>
+        <small class="text-success fw-semibold"><i class="bi bi-check-circle"></i> Non-cancelled orders</small>
       </div>
       <div class="kpi-icon bg-primary-subtle text-primary">
         <i class="bi bi-currency-dollar"></i>
@@ -37,8 +37,8 @@
     <div class="kpi-card d-flex align-items-center justify-content-between">
       <div>
         <span class="text-muted small fw-semibold text-uppercase">Total Orders</span>
-        <h3 class="fw-bold text-dark mb-0">1,245</h3>
-        <small class="text-success fw-semibold"><i class="bi bi-arrow-up-right"></i> +8.2% vs last month</small>
+        <h3 class="fw-bold text-dark mb-0">{{ total_orders }}</h3>
+        <small class="text-info fw-semibold"><i class="bi bi-hourglass-split"></i> {{ pending_orders_count }} in progress</small>
       </div>
       <div class="kpi-icon bg-info-subtle text-info">
         <i class="bi bi-bag-check"></i>
@@ -49,9 +49,9 @@
   <div class="col-12 col-sm-6 col-xl-3">
     <div class="kpi-card d-flex align-items-center justify-content-between">
       <div>
-        <span class="text-muted small fw-semibold text-uppercase">Total Customers</span>
-        <h3 class="fw-bold text-dark mb-0">3,842</h3>
-        <small class="text-success fw-semibold"><i class="bi bi-arrow-up-right"></i> +15.1% new users</small>
+        <span class="text-muted small fw-semibold text-uppercase">Registered Buyers</span>
+        <h3 class="fw-bold text-dark mb-0">{{ total_customers }}</h3>
+        <small class="text-success fw-semibold"><i class="bi bi-person-check"></i> Active accounts</small>
       </div>
       <div class="kpi-icon bg-success-subtle text-success">
         <i class="bi bi-people"></i>
@@ -62,9 +62,9 @@
   <div class="col-12 col-sm-6 col-xl-3">
     <div class="kpi-card d-flex align-items-center justify-content-between">
       <div>
-        <span class="text-muted small fw-semibold text-uppercase">Active Products</span>
-        <h3 class="fw-bold text-dark mb-0">186</h3>
-        <small class="text-muted fw-semibold">24 Categories</small>
+        <span class="text-muted small fw-semibold text-uppercase">Catalog Items</span>
+        <h3 class="fw-bold text-dark mb-0">{{ active_products_count }}</h3>
+        <small class="text-muted fw-semibold">Live in storefront</small>
       </div>
       <div class="kpi-icon bg-warning-subtle text-warning">
         <i class="bi bi-box-seam"></i>
@@ -115,8 +115,8 @@
         <a href="{{ url_for('admin_orders') }}" class="btn btn-link btn-sm text-decoration-none fw-semibold">View All</a>
       </div>
       <div class="table-responsive">
-        <table class="table align-middle text-nowrap mb-0">
-          <thead class="bg-light small text-muted">
+        <table class="table align-middle text-nowrap mb-0 table-hover">
+          <thead class="bg-light small text-muted text-uppercase">
             <tr>
               <th>ORDER ID</th>
               <th>CUSTOMER</th>
@@ -127,38 +127,37 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1092') }}" class="text-dark">#ORD-1092</a></td>
-              <td>Sarah Jenkins</td>
-              <td class="text-muted">Aug 24, 2026</td>
-              <td class="fw-bold">$1,399.00</td>
-              <td><span class="badge badge-status badge-delivered">Delivered</span></td>
-              <td class="text-end"><a href="{{ url_for('admin_order_detail', order_id='ORD-1092') }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a></td>
-            </tr>
-            <tr>
-              <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1091') }}" class="text-dark">#ORD-1091</a></td>
-              <td>Michael Chang</td>
-              <td class="text-muted">Aug 24, 2026</td>
-              <td class="fw-bold">$399.00</td>
-              <td><span class="badge badge-status badge-processing">Processing</span></td>
-              <td class="text-end"><a href="{{ url_for('admin_order_detail', order_id='ORD-1091') }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a></td>
-            </tr>
-            <tr>
-              <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1090') }}" class="text-dark">#ORD-1090</a></td>
-              <td>Elena Rostova</td>
-              <td class="text-muted">Aug 23, 2026</td>
-              <td class="fw-bold">$2,299.00</td>
-              <td><span class="badge badge-status badge-shipped">Shipped</span></td>
-              <td class="text-end"><a href="{{ url_for('admin_order_detail', order_id='ORD-1090') }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a></td>
-            </tr>
-            <tr>
-              <td class="fw-bold"><a href="{{ url_for('admin_order_detail', order_id='ORD-1089') }}" class="text-dark">#ORD-1089</a></td>
-              <td>James Wilson</td>
-              <td class="text-muted">Aug 23, 2026</td>
-              <td class="fw-bold">$129.00</td>
-              <td><span class="badge badge-status badge-pending">Pending</span></td>
-              <td class="text-end"><a href="{{ url_for('admin_order_detail', order_id='ORD-1089') }}" class="btn btn-sm btn-light"><i class="bi bi-eye"></i></a></td>
-            </tr>
+            {% if recent_orders and recent_orders|length > 0 %}
+              {% for order in recent_orders %}
+                <tr>
+                  <td class="fw-bold">
+                    <a href="{{ url_for('admin_order_detail', order_id=order.order_number) }}" class="text-dark text-decoration-none">
+                      #{{ order.order_number }}
+                    </a>
+                  </td>
+                  <td>
+                    <span class="fw-medium text-dark">{{ order.customer_name }}</span>
+                    <small class="text-muted d-block" style="font-size: 0.75rem;">{{ order.customer_email }}</small>
+                  </td>
+                  <td class="text-muted">
+                    {{ order.created_at.strftime('%b %d, %Y') if order.created_at else 'Recent' }}
+                  </td>
+                  <td class="fw-bold text-dark">${{ "%.2f"|format(order.total_amount) }}</td>
+                  <td><span class="badge badge-status badge-{{ order.status|lower }}">{{ order.status }}</span></td>
+                  <td class="text-end">
+                    <a href="{{ url_for('admin_order_detail', order_id=order.order_number) }}" class="btn btn-sm btn-light" title="View Order Details">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6" class="text-center py-4 text-muted">
+                  No orders recorded yet.
+                </td>
+              </tr>
+            {% endif %}
           </tbody>
         </table>
       </div>

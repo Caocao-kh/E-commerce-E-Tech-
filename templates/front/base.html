@@ -1,1 +1,152 @@
-{% extends 'front/index.html' %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Tech{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper-bundle.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lightbox.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.nice-number.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/slick.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/slick-theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.nstSlider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Header -->
+    {% include 'front/partials/header.html' %}
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    {% include 'front/partials/footer.html' %}
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/swiper.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/waypoints.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/appear.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/counterup.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/wow.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/circle-progress.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.paroller.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/nice-number.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.scrollUp.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.counterup.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/smoothscroll.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.nstSlider.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/slick.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.paroller.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tilt.jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            offset: 100
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Handle responsive menu for modern Bootstrap
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+                        const bsCollapse = new bootstrap.Collapse(navbarCollapse);
+                        bsCollapse.hide();
+                    }
+                });
+            });
+
+            // Handle sticky header
+            const header = document.querySelector('.main-header');
+            if (header) {
+                const headerHeight = header.offsetHeight;
+                let headerFixed = false;
+
+                const toggleHeader = () => {
+                    const scrollPos = window.pageYOffset;
+
+                    if (scrollPos >= 200 && !headerFixed) {
+                        header.classList.add('fixed-header');
+                        header.style.position = 'fixed';
+                        header.style.top = '0';
+                        header.style.left = '0';
+                        header.style.right = '0';
+                        header.style.zIndex = '1030';
+                        document.body.style.paddingTop = `${headerHeight}px`;
+                        headerFixed = true;
+                    } else if (scrollPos < 200 && headerFixed) {
+                        header.classList.remove('fixed-header');
+                        header.style.position = 'relative';
+                        header.style.top = 'auto';
+                        header.style.left = 'auto';
+                        header.style.right = 'auto';
+                        header.style.zIndex = 'auto';
+                        document.body.style.paddingTop = '0';
+                        headerFixed = false;
+                    }
+                };
+
+                window.addEventListener('scroll', toggleHeader);
+                window.addEventListener('resize', toggleHeader);
+                toggleHeader(); // Initial check
+            }
+
+            // Search functionality
+            const searchButton = document.querySelector('#navbar-search-btn');
+            const searchOverlay = document.querySelector('.search-overlay');
+            const closeSearch = document.querySelector('.close-search');
+            const searchInput = document.querySelector('.search-input');
+
+            if (searchButton && searchOverlay) {
+                searchButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    searchOverlay.classList.add('active');
+                    if (searchInput) {
+                        searchInput.focus();
+                    }
+                });
+            }
+
+            if (closeSearch) {
+                closeSearch.addEventListener('click', () => {
+                    if (searchOverlay) {
+                        searchOverlay.classList.remove('active');
+                    }
+                });
+            }
+
+            // Close search when clicking outside
+            if (searchOverlay) {
+                searchOverlay.addEventListener('click', (e) => {
+                    if (e.target === searchOverlay) {
+                        searchOverlay.classList.remove('active');
+                    }
+                });
+            }
+
+            // Auto-focus search input when overlay opens
+            const searchOverlayObserver = new MutationObserver((mutations)

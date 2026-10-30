@@ -158,6 +158,47 @@
   place-items: center;
 }
 
+/* Table Action Buttons */
+.admin-action-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #64748b;
+  font-size: 0.875rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+}
+
+.admin-action-btn.btn-view:hover {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+
+.admin-action-btn.btn-edit:hover {
+  background-color: #fefce8;
+  border-color: #fef08a;
+  color: #ca8a04;
+}
+
+.admin-action-btn.btn-delete:hover {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
 /* Mobile Responsive Adjustments */
 
 @media (max-width: 991.98px) {

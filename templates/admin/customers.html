@@ -25,10 +25,54 @@
         </tr>
       </thead>
       <tbody>
+        {% if users %}
+        {% for u in users %}
         <tr>
           <td>
             <div class="d-flex align-items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb" class="rounded-circle object-fit-cover" style="width: 40px; height: 40px;" alt="Sarah">
+              <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                style="width: 40px; height: 40px;">
+                {{ u.username[0]|upper if u.username else 'U' }}
+              </div>
+              <div>
+                <h6 class="fw-bold mb-0">{{ u.username }}</h6>
+                <small class="text-muted">{{ u.role|title }} Account</small>
+              </div>
+            </div>
+          </td>
+          <td><span class="text-muted small">{{ u.email }}</span></td>
+          <td>{{ u.orders|length }} Order(s)</td>
+          <td class="fw-bold text-dark">
+            ${{ "%.2f"|format(u.orders|map(attribute='total_amount')|sum) }}
+          </td>
+          <td class="text-muted">{{ u.created_at.strftime('%b %d, %Y') if u.created_at else 'Aug 2026' }}</td>
+          <td>
+            {% if u.status %}
+            <span class="badge bg-success-subtle text-success">Active</span>
+            {% else %}
+            <span class="badge bg-danger-subtle text-danger">Banned / Inactive</span>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            <div class="d-inline-flex align-items-center justify-content-end gap-1">
+              <a href="mailto:{{ u.email }}" class="admin-action-btn btn-view" title="Email Customer"
+                data-bs-toggle="tooltip">
+                <i class="fa-solid fa-envelope"></i>
+              </a>
+              <button type="button" class="admin-action-btn btn-delete" title="Block Account" data-bs-toggle="modal"
+                data-bs-target="#deleteConfirmModal">
+                <i class="fa-solid fa-ban"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+                class="rounded-circle object-fit-cover" style="width: 40px; height: 40px;" alt="Sarah">
               <div>
                 <h6 class="fw-bold mb-0">Sarah Jenkins</h6>
                 <small class="text-muted">Phnom Penh, Cambodia</small>
@@ -41,52 +85,19 @@
           <td class="text-muted">Jan 12, 2024</td>
           <td><span class="badge bg-success-subtle text-success">Active</span></td>
           <td class="text-end">
-            <button class="btn btn-sm btn-outline-secondary rounded-circle" title="Email Customer"><i class="bi bi-envelope"></i></button>
-            <button class="btn btn-sm btn-outline-danger rounded-circle" title="Block Account" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-slash-circle"></i></button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-            <div class="d-flex align-items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d" class="rounded-circle object-fit-cover" style="width: 40px; height: 40px;" alt="Michael">
-              <div>
-                <h6 class="fw-bold mb-0">Michael Chang</h6>
-                <small class="text-muted">Siem Reap, Cambodia</small>
-              </div>
+            <div class="d-inline-flex align-items-center justify-content-end gap-1">
+              <a href="mailto:sarah.j@example.com" class="admin-action-btn btn-view" title="Email Customer"
+                data-bs-toggle="tooltip">
+                <i class="fa-solid fa-envelope"></i>
+              </a>
+              <button type="button" class="admin-action-btn btn-delete" title="Block Account" data-bs-toggle="modal"
+                data-bs-target="#deleteConfirmModal">
+                <i class="fa-solid fa-ban"></i>
+              </button>
             </div>
           </td>
-          <td>michael.c@example.com</td>
-          <td>8 Orders</td>
-          <td class="fw-bold text-dark">$2,140.00</td>
-          <td class="text-muted">Mar 05, 2024</td>
-          <td><span class="badge bg-success-subtle text-success">Active</span></td>
-          <td class="text-end">
-            <button class="btn btn-sm btn-outline-secondary rounded-circle" title="Email Customer"><i class="bi bi-envelope"></i></button>
-            <button class="btn btn-sm btn-outline-danger rounded-circle" title="Block Account" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-slash-circle"></i></button>
-          </td>
         </tr>
-
-        <tr>
-          <td>
-            <div class="d-flex align-items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2" class="rounded-circle object-fit-cover" style="width: 40px; height: 40px;" alt="Elena">
-              <div>
-                <h6 class="fw-bold mb-0">Elena Rostova</h6>
-                <small class="text-muted">Battambang, Cambodia</small>
-              </div>
-            </div>
-          </td>
-          <td>elena.r@example.com</td>
-          <td>22 Orders</td>
-          <td class="fw-bold text-dark">$9,890.00</td>
-          <td class="text-muted">Nov 18, 2023</td>
-          <td><span class="badge bg-success-subtle text-success">Active</span></td>
-          <td class="text-end">
-            <button class="btn btn-sm btn-outline-secondary rounded-circle" title="Email Customer"><i class="bi bi-envelope"></i></button>
-            <button class="btn btn-sm btn-outline-danger rounded-circle" title="Block Account" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"><i class="bi bi-slash-circle"></i></button>
-          </td>
-        </tr>
+        {% endif %}
       </tbody>
     </table>
   </div>

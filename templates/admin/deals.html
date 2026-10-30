@@ -9,7 +9,7 @@
     <p class="text-muted small mb-0">Create and schedule flash sales, banner offers, and discount codes.</p>
   </div>
   <button class="btn btn-primary rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#dealModal">
-    <i class="bi bi-plus-lg me-1"></i> Add New Deal
+    <i class="fa-solid fa-plus me-1"></i> Add New Deal
   </button>
 </div>
 
@@ -39,9 +39,14 @@
           <td>Aug 30, 2026</td>
           <td><span class="badge bg-success-subtle text-success">Active</span></td>
           <td class="text-end">
-            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dealModal" title="Edit Deal" aria-label="Edit Deal"><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" title="Delete Deal" aria-label="Delete Deal"><i class="bi bi-trash"></i></button>
-
+            <div class="d-inline-flex align-items-center justify-content-end gap-1">
+              <button type="button" class="admin-action-btn btn-edit" data-bs-toggle="modal" data-bs-target="#dealModal" title="Edit Deal">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" class="admin-action-btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" title="Delete Deal">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
           </td>
         </tr>
 
@@ -56,9 +61,14 @@
           <td>Sep 01, 2026</td>
           <td><span class="badge bg-success-subtle text-success">Active</span></td>
           <td class="text-end">
-            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dealModal" title="Edit Deal" aria-label="Edit Deal"><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" title="Delete Deal" aria-label="Delete Deal"><i class="bi bi-trash"></i></button>
-
+            <div class="d-inline-flex align-items-center justify-content-end gap-1">
+              <button type="button" class="admin-action-btn btn-edit" data-bs-toggle="modal" data-bs-target="#dealModal" title="Edit Deal">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" class="admin-action-btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" title="Delete Deal">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,42 +9,51 @@
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
   <!-- Bootstrap 5 CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
   <!-- Admin CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
+
 <body>
 
   <div id="admin-wrapper">
-    
+
     <!-- Sidebar Navigation -->
     <aside id="admin-sidebar">
       <div class="sidebar-header d-flex align-items-center justify-content-between">
-        <a href="{{ url_for('admin_dashboard') }}" class="text-white text-decoration-none fw-bold fs-4 d-flex align-items-center">
+        <a href="{{ url_for('admin_dashboard') }}"
+          class="text-white text-decoration-none fw-bold fs-4 d-flex align-items-center">
           <span class="bg-primary text-white rounded-3 px-2 py-1 me-2 fs-5">E</span> Administration
         </a>
       </div>
 
       <ul class="sidebar-menu">
         <li class="nav-item">
-          <a href="{{ url_for('admin_dashboard') }}" class="nav-link {{ 'active' if active_page == 'dashboard' else '' }}">
+          <a href="{{ url_for('admin_dashboard') }}"
+            class="nav-link {{ 'active' if active_page == 'dashboard' else '' }}">
             <i class="bi bi-speedometer2"></i> Dashboard
           </a>
         </li>
         <li class="nav-item">
-          <a href="{{ url_for('admin_products') }}" class="nav-link {{ 'active' if active_page == 'products' else '' }}">
+          <a href="{{ url_for('admin_products') }}"
+            class="nav-link {{ 'active' if active_page == 'products' else '' }}">
             <i class="bi bi-box-seam"></i> Products
           </a>
         </li>
         <li class="nav-item">
-          <a href="{{ url_for('admin_categories') }}" class="nav-link {{ 'active' if active_page == 'categories' else '' }}">
+          <a href="{{ url_for('admin_categories') }}"
+            class="nav-link {{ 'active' if active_page == 'categories' else '' }}">
             <i class="bi bi-grid"></i> Categories
           </a>
         </li>
@@ -53,7 +63,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="{{ url_for('admin_customers') }}" class="nav-link {{ 'active' if active_page == 'customers' else '' }}">
+          <a href="{{ url_for('admin_customers') }}"
+            class="nav-link {{ 'active' if active_page == 'customers' else '' }}">
             <i class="bi bi-people"></i> Customers
           </a>
         </li>
@@ -63,14 +74,25 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="{{ url_for('admin_settings') }}" class="nav-link {{ 'active' if active_page == 'settings' else '' }}">
+          <a href="{{ url_for('admin_profile') }}" class="nav-link {{ 'active' if active_page == 'profile' else '' }}">
+            <i class="bi bi-person-badge"></i> Admin Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url_for('admin_settings') }}"
+            class="nav-link {{ 'active' if active_page == 'settings' else '' }}">
             <i class="bi bi-gear"></i> Settings
           </a>
         </li>
 
         <li class="nav-item mt-4 pt-3 border-top border-secondary">
           <a href="{{ url_for('home') }}" class="nav-link text-warning">
-            <i class="bi bi-shop"></i> View Storefront
+            <i class="bi bi-shop"></i> View Store
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ url_for('admin_logout') }}" class="nav-link text-danger">
+            <i class="bi bi-box-arrow-right"></i> Log Out
           </a>
         </li>
       </ul>
@@ -78,7 +100,7 @@
 
     <!-- Main Content Area -->
     <div id="admin-main">
-      
+
       <!-- Topbar -->
       <header class="admin-topbar">
         <div class="d-flex align-items-center gap-3">
@@ -98,27 +120,77 @@
           <!-- Notification -->
           <button class="btn btn-light rounded-circle position-relative p-2" title="Notifications">
             <i class="bi bi-bell fs-5"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">3</span>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              style="font-size: 0.6rem;">3</span>
           </button>
 
           <!-- User Profile -->
           <div class="dropdown">
-            <button class="btn btn-light rounded-pill dropdown-toggle d-flex align-items-center gap-2 p-1 px-3 border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <div class="bg-primary text-white rounded-circle d-grid place-items-center" style="width: 28px; height: 28px; font-size: 0.8rem;">A</div>
-              <span class="small fw-semibold">Admin User</span>
+            {% if current_user is defined and current_user.is_authenticated %}
+            <button
+              class="btn btn-light rounded-pill dropdown-toggle d-flex align-items-center gap-2 p-1 px-3 border shadow-sm"
+              type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if current_user.profile_image %}
+              <img src="{{ url_for('static', filename=current_user.profile_image) }}" alt="{{ current_user.username }}"
+                class="rounded-circle object-fit-cover" style="width: 28px; height: 28px;"
+                onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default-avatar.svg') }}';">
+              {% else %}
+              <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                style="width: 28px; height: 28px; font-size: 0.8rem;">
+                {{ current_user.username[0]|upper }}
+              </div>
+              {% endif %}
+              <div class="text-start d-none d-sm-block lh-1">
+                <span class="small fw-semibold d-block">{{ current_user.username }}</span>
+                <span class="text-muted" style="font-size: 0.7rem;">{{ current_user.role|capitalize }}</span>
+              </div>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-              <li><a class="dropdown-item" href="{{ url_for('admin_settings') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('admin_settings') }}"><i class="bi bi-gear me-2"></i>Settings</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="{{ url_for('home') }}"><i class="bi bi-box-arrow-right me-2"></i>Exit Portal</a></li>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
+              <li class="px-3 py-2 border-bottom">
+                <div class="fw-bold small">{{ current_user.username }}</div>
+                <div class="text-muted small text-truncate" style="max-width: 180px;">{{ current_user.email }}</div>
+                <span class="badge bg-primary-subtle text-primary mt-1" style="font-size: 0.65rem;">{{
+                  current_user.role|upper }}</span>
+              </li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('admin_profile') }}"><i
+                    class="bi bi-person-badge me-2 text-primary"></i>Admin Profile</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('admin_settings') }}"><i
+                    class="bi bi-gear me-2"></i>Store Settings</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('home') }}"><i class="bi bi-shop me-2"></i>View
+                  Store</a></li>
+              <li>
+                <hr class="dropdown-divider my-1">
+              </li>
+              <li><a class="dropdown-item py-2 text-danger" href="{{ url_for('admin_logout') }}"><i
+                    class="bi bi-box-arrow-right me-2"></i>Log Out</a></li>
             </ul>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-sm rounded-pill px-3">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Log In
+            </a>
+            {% endif %}
           </div>
         </div>
       </header>
 
       <!-- Main Container Body -->
       <main class="admin-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div
+          class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-4 shadow-sm mb-4"
+          role="alert">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-info-circle-fill"></i>
+            <div>{{ message }}</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
         {% block content %}{% endblock %}
       </main>
 
@@ -133,7 +205,8 @@
         <div class="modal-body">
           <i class="bi bi-exclamation-triangle text-danger display-4 mb-2"></i>
           <h5 class="fw-bold mb-2">Confirm Delete</h5>
-          <p class="text-muted small mb-4">Are you sure you want to delete this record? This action cannot be undone.</p>
+          <p class="text-muted small mb-4">Are you sure you want to delete this record? This action cannot be undone.
+          </p>
           <div class="d-flex justify-content-center gap-2">
             <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
             <button type="button" id="confirmDeleteBtn" class="btn btn-danger rounded-pill px-3">Delete</button>
@@ -150,4 +223,5 @@
   {% block extra_js %}{% endblock %}
 
 </body>
+
 </html>

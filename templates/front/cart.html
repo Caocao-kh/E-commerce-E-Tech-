@@ -3,6 +3,19 @@
 {% block title %}Shopping Cart | E-Tech{% endblock %}
 
 {% block content %}
+<!-- Auth data element for cart.js -->
+<div id="cart-auth-data" 
+     data-authenticated="{{ 'true' if current_user.is_authenticated else 'false' }}" 
+     data-username="{{ current_user.username if current_user.is_authenticated else '' }}" 
+     data-email="{{ current_user.email if current_user.is_authenticated else '' }}" 
+     data-address="{{ current_user.address if current_user.is_authenticated and current_user.address else '' }}" 
+     data-phone="{{ current_user.phone if current_user.is_authenticated and current_user.phone else '' }}"
+     style="display: none;">
+</div>
+<script>
+  window.IS_USER_AUTHENTICATED = {{ 'true' if current_user.is_authenticated else 'false' }};
+</script>
+
 <section class="cart-page py-5">
   <div class="container">
 
@@ -31,10 +44,10 @@
   </div>
 </section>
 
-<!-- Mock Checkout Modal -->
+<!-- Mock Checkout Modal (For Authenticated Users) -->
 <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content border-0 shadow-lg rounded-4">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
       <div class="modal-header border-bottom-0 pb-0">
         <h5 class="modal-header-title fw-bold" id="checkoutModalLabel">
           <i class="bi bi-shield-lock text-primary me-2"></i>Complete Demo Order
@@ -42,36 +55,38 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body p-4">
-        <form id="checkout-form" onsubmit="event.preventDefault(); bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide(); clearCart(); showToast('Order placed successfully! (Demo)', 'success');">
+        <form id="checkout-form" method="POST" action="{{ url_for('process_checkout') }}" onsubmit="document.getElementById('cart_data_input').value = JSON.stringify(getCart()); localStorage.removeItem('cart');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+          <input type="hidden" name="cart_data" id="cart_data_input" value="">
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label fw-semibold">Full Name</label>
-              <input type="text" class="form-control" value="John Doe" required>
+              <input type="text" name="full_name" class="form-control" value="{{ current_user.username if current_user.is_authenticated else '' }}" required>
             </div>
             <div class="col-md-6">
               <label class="form-label fw-semibold">Email Address</label>
-              <input type="email" class="form-control" value="john@example.com" required>
+              <input type="email" name="email" class="form-control" value="{{ current_user.email if current_user.is_authenticated else '' }}" required>
             </div>
             <div class="col-12">
               <label class="form-label fw-semibold">Shipping Address</label>
-              <input type="text" class="form-control" value="123 Technology Way, Suite 400" required>
+              <input type="text" name="address" class="form-control" value="{{ current_user.address if current_user.is_authenticated and current_user.address else '123 Technology Way, Suite 400' }}" required>
             </div>
             <div class="col-md-6">
               <label class="form-label fw-semibold">City</label>
-              <input type="text" class="form-control" value="Phnom Penh" required>
+              <input type="text" name="city" class="form-control" value="Phnom Penh" required>
             </div>
             <div class="col-md-6">
               <label class="form-label fw-semibold">Payment Method</label>
-              <select class="form-select">
-                <option value="card">Credit / Debit Card</option>
-                <option value="cod">Cash on Delivery</option>
-                <option value="aba">ABA PAY / Bakong QR</option>
+              <select name="payment_method" class="form-select">
+                <option value="Credit / Debit Card">Credit / Debit Card</option>
+                <option value="Cash on Delivery">Cash on Delivery</option>
+                <option value="ABA PAY / Bakong QR">ABA PAY / Bakong QR</option>
               </select>
             </div>
           </div>
           
           <div class="alert alert-info border-0 rounded-3 mt-4 small mb-0">
-            <i class="bi bi-info-circle me-1"></i> This is a client-side frontend demo. No actual payment processing or real charge will occur.
+            <i class="bi bi-info-circle me-1"></i> Logged in as <strong>{{ current_user.username if current_user.is_authenticated else 'Guest' }}</strong>. Your order will be recorded in your order history.
           </div>
 
           <div class="mt-4 text-end">
@@ -79,6 +94,53 @@
             <button type="submit" class="btn btn-dark rounded-pill px-4">Place Order</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Required Modal (For Guests) -->
+<div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header border-bottom-0 pb-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <div class="mb-3">
+          <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+            <i class="bi bi-person-lock fs-1"></i>
+          </div>
+        </div>
+        <h4 class="fw-bold mb-2">Login Required to Checkout</h4>
+        <p class="text-muted small mb-4">Please log in to your E-Tech account or create a new account to review shipping and complete your order.</p>
+        <div class="d-grid gap-2">
+          <a href="{{ url_for('login') }}?next={{ url_for('cart') }}" class="btn btn-dark rounded-pill py-2 fw-semibold">
+            <i class="bi bi-box-arrow-in-right me-2"></i> Log In to Continue
+          </a>
+          <a href="{{ url_for('register') }}" class="btn btn-outline-secondary rounded-pill py-2">
+            Create an Account
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Clear Cart Confirmation Modal -->
+<div class="modal fade" id="clearCartModal" tabindex="-1" aria-labelledby="clearCartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-body p-4 text-center">
+        <div class="mb-3 text-danger">
+          <i class="bi bi-trash3 display-4"></i>
+        </div>
+        <h5 class="fw-bold mb-2">Clear Cart?</h5>
+        <p class="text-muted small mb-4">Are you sure you want to remove all items from your shopping cart?</p>
+        <div class="d-flex justify-content-center gap-2">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-3 btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger rounded-pill px-3 btn-sm btn-cart-clear-confirm" data-cart-action="clear-all" data-bs-dismiss="modal" onclick="clearCart()">Yes, Clear All</button>
+        </div>
       </div>
     </div>
   </div>

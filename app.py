@@ -1,81 +1,70 @@
 import os
-import re
-from datetime import datetime, timedelta
-from urllib.parse import urlparse, urljoin
+import sys
+from datetime import timedelta
+from flask import Flask, request, abort
+from flask_migrate import Migrate
+from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    env_file = os.path.join(BASE_DIR, ".env")
+    if os.path.exists(env_file):
+        load_dotenv(env_file)
+    else:
+        load_dotenv()
 except ImportError:
     pass
 
-from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    flash,
-    abort
+# Import modular models, forms, helpers, and route modules
+from models import db, User, Order, get_utc_now
+from forms import LoginForm, RegisterForm
+from helpers import (
+    rate_limiter,
+    brute_force_protector,
+    validate_password_complexity,
+    BLOCKED_USER_AGENTS,
+    detect_waf_threat,
+    contains_malicious_js,
 )
-
-
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import (
-    LoginManager,
-    UserMixin,
-    login_user,
-    login_required,
-    logout_user,
-    current_user
-)
-from flask_wtf import FlaskForm
-from wtforms import (
-    StringField,
-    PasswordField,
-    SubmitField,
-    BooleanField,
-    TextAreaField
-)
-from wtforms.validators import (
-    DataRequired,
-    Email,
-    Length,
-    EqualTo,
-    ValidationError
-)
-from werkzeug.security import (
-    generate_password_hash,
-    check_password_hash
-)
-from flask_wtf.csrf import CSRFProtect
-
-from products import get_all_products, get_product_by_id
-
+from front import register_front_routes
+from admin import register_admin_routes
 
 # ============================================================
-# APP CONFIGURATION
+# APP INITIALIZATION & CONFIGURATION
 # ============================================================
-app = Flask(__name__)
-app.secret_key = "dev-secret-key"
 
-# =========================================================
-# CONFIGURATION
-# =========================================================
+INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
+os.makedirs(INSTANCE_DIR, exist_ok=True)
+DEFAULT_DB_PATH = os.path.join(INSTANCE_DIR, "E_Tech.db").replace("\\", "/")
 
-app.config["SECRET_KEY"] = os.getenv(
-    "SECRET_KEY",
-    "development-secret-key"
+app = Flask(
+    __name__,
+    root_path=BASE_DIR,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static"),
+    instance_path=INSTANCE_DIR,
 )
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
-    "DATABASE_URL",
-    "sqlite:///E_Tech.db"
-)
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "development-secret-key")
+app.secret_key = app.config["SECRET_KEY"]
+
+raw_db_url = os.getenv("DATABASE_URL", "").strip()
+if not raw_db_url or ("sqlite:///" in raw_db_url and ("E_Tech.db" in raw_db_url or "etech.db" in raw_db_url)):
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DEFAULT_DB_PATH}"
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = raw_db_url
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "connect_args": {"timeout": 30},
+}
 
-# Session security & CSRF defense configuration
+# Session security configuration
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = False  # Set to True in HTTPS production
@@ -90,395 +79,95 @@ app.config["WTF_CSRF_CHECK_DEFAULT"] = True
 # Maximum upload/request size: 2 MB
 app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024
 
+# Static upload folders
+UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads", "profiles")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# =========================================================
-# EXTENSIONS
-# =========================================================
+# ============================================================
+# EXTENSIONS INITIALIZATION
+# ============================================================
 
-db = SQLAlchemy(app)
-
+db.init_app(app)
 migrate = Migrate(app, db)
-
 login_manager = LoginManager(app)
-
 login_manager.login_view = "login"
-
+login_manager.login_message = "Please sign in to access this page."
+login_manager.login_message_category = "warning"
 csrf = CSRFProtect(app)
 
-# =========================================================
-# USER MODEL
-# =========================================================
 
-class User(UserMixin, db.Model):
-
-    __tablename__ = "users"
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    username = db.Column(
-        db.String(80),
-        unique=True,
-        nullable=False
-    )
-
-    email = db.Column(
-        db.String(120),
-        unique=True,
-        nullable=False
-    )
-
-    password_hash = db.Column(
-        db.String(255),
-        nullable=False
-    )
-
-    role = db.Column(
-        db.String(20),
-        nullable=False,
-        default="customer"
-    )
-
-    phone = db.Column(
-        db.String(30),
-        nullable=True
-    )
-
-    address = db.Column(
-        db.Text,
-        nullable=True
-    )
-
-    profile_image = db.Column(
-        db.String(255),
-        nullable=True
-    )
-
-    status = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=True
-    )
-
-    created_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow
-    )
-
-    # -----------------------------------------------------
-    # PASSWORD HASHING
-    # -----------------------------------------------------
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(
-            password
-        )
-
-    def check_password(self, password):
-        return check_password_hash(
-            self.password_hash,
-            password
-        )
-
-    def __repr__(self):
-        return f"<User {self.username}>"
-
-# =========================================================
-# FLASK-LOGIN
-# =========================================================
+# ============================================================
+# FLASK-LOGIN USER LOADER
+# ============================================================
 
 @login_manager.user_loader
 def load_user(user_id):
+    try:
+        return db.session.get(User, int(user_id))
+    except Exception:
+        return None
 
-    return db.session.get(
-        User,
-        int(user_id)
-    )
-
-# =========================================================
-# FORMS
-# =========================================================
-
-class LoginForm(FlaskForm):
-
-    email = StringField(
-        "Email",
-        validators=[
-            DataRequired(),
-            Email(),
-            Length(max=120)
-        ]
-    )
-
-    password = PasswordField(
-        "Password",
-        validators=[
-            DataRequired()
-        ]
-    )
-
-    submit = SubmitField(
-        "Login"
-    )
-
-
-class RegisterForm(FlaskForm):
-
-    username = StringField(
-        "Username",
-        validators=[
-            DataRequired(),
-            Length(min=3, max=80)
-        ]
-    )
-
-    email = StringField(
-        "Email",
-        validators=[
-            DataRequired(),
-            Email(),
-            Length(max=120)
-        ]
-    )
-
-    password = PasswordField(
-        "Password",
-        validators=[
-            DataRequired(),
-            Length(min=8, max=128)
-        ]
-    )
-
-    confirm_password = PasswordField(
-        "Confirm Password",
-        validators=[
-            DataRequired(),
-            EqualTo(
-                "password",
-                message="Passwords must match."
-            )
-        ]
-    )
-
-    submit = SubmitField(
-        "Create Account"
-    )
 
 # ============================================================
-# HOME
+# SECURITY HOOKS & MIDDLEWARE
 # ============================================================
 
-@app.route("/")
-def home():
-    module = "home"
-    products = get_all_products()
+@app.before_request
+def global_security_defense():
+    """
+    Global pre-request security hook:
+    1. DDoS / Rate Limiting defense against flood attacks.
+    2. WAF Scanner Blocking against automated scanners (sqlmap, nikto, etc.).
+    3. WAF Path Traversal, Command Injection & SQLi detection.
+    4. URL JS & Form JS Code Defense.
+    """
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "127.0.0.1").split(",")[0].strip()
 
-    # Show featured products on homepage
-    featured_products = products[:8]
+    # 1. DDoS / Rate Limiting (exempt in automated testing)
+    is_testing = bool(app.config.get("TESTING"))
+    allowed, retry_after = rate_limiter.check(client_ip, request.path, is_testing=is_testing)
+    if not allowed:
+        return "429 Too Many Requests: DDoS protection active. Rate limit exceeded.", 429, {"Retry-After": str(retry_after)}
 
-    return render_template(
-        "front/home.html",
-        products=featured_products,
-        module=module,
-    )
+    # 2. Block Automated Security Scanners
+    user_agent = (request.user_agent.string or "").lower()
+    for scanner in BLOCKED_USER_AGENTS:
+        if scanner in user_agent:
+            abort(403, description=f"Access blocked by WAF: Automated security scanner detected ({scanner}).")
 
-# =========================================================
-# REGISTER
-# =========================================================
+    # 3. Path & Query Inspection (Path Traversal & XSS)
+    path_threat = detect_waf_threat(request.path)
+    if path_threat:
+        abort(400, description=f"WAF Alert: {path_threat} detected in request path.")
 
-@app.route(
-    "/register",
-    methods=["GET", "POST"]
-)
-def register():
+    for param_name, param_value in request.args.items():
+        if contains_malicious_js(param_value):
+            abort(400, description="WAF Alert: Malicious JavaScript detected in URL query.")
+        threat = detect_waf_threat(param_value)
+        # Allow literal search query terms in ?q unless they are explicit dangerous exploits
+        if threat and not (param_name == "q" and threat == "SQL Injection Attack Signature" and "'" in param_value):
+            abort(400, description=f"WAF Alert: {threat} detected in URL query.")
 
-    form = RegisterForm()
+    # 4. Form & Body Threat Inspection
+    if request.method in ["POST", "PUT", "PATCH", "DELETE"]:
+        for field_name, field_value in request.form.items():
+            if contains_malicious_js(field_value):
+                abort(400, description="WAF Alert: Unsafe JavaScript code detected in form input field.")
+            threat = detect_waf_threat(field_value)
+            if threat:
+                abort(400, description=f"WAF Alert: {threat} detected in form input.")
 
-    if form.validate_on_submit():
+        if request.is_json:
+            json_data = request.get_json(silent=True) or {}
+            if isinstance(json_data, dict):
+                for k, v in json_data.items():
+                    if isinstance(v, str):
+                        if contains_malicious_js(v):
+                            abort(400, description="WAF Alert: Unsafe JavaScript payload detected in JSON body.")
+                        threat = detect_waf_threat(v)
+                        if threat:
+                            abort(400, description=f"WAF Alert: {threat} detected in JSON body.")
 
-        username = form.username.data.strip()
-
-        email = form.email.data.strip().lower()
-
-        # Check duplicate username
-        existing_username = User.query.filter_by(
-            username=username
-        ).first()
-
-        if existing_username:
-
-            flash(
-                "Username already exists.",
-                "danger"
-            )
-
-            return render_template(
-                "register.html",
-                form=form
-            )
-
-
-        # Check duplicate email
-        existing_email = User.query.filter_by(
-            email=email
-        ).first()
-
-        if existing_email:
-
-            flash(
-                "Email already registered.",
-                "danger"
-            )
-
-            return render_template(
-                "register.html",
-                form=form
-            )
-
-
-        # Create user
-        user = User(
-            username=username,
-            email=email,
-            role="customer"
-        )
-
-        # NEVER store plaintext password
-        user.set_password(
-            form.password.data
-        )
-
-        db.session.add(user)
-
-        db.session.commit()
-
-        flash(
-            "Registration successful. You can now login.",
-            "success"
-        )
-
-        return redirect(
-            url_for("login")
-        )
-
-    return render_template(
-        "register.html",
-        form=form
-    )
-
-
-# =========================================================
-# LOGIN
-# =========================================================
-
-@app.route(
-    "/login",
-    methods=["GET", "POST"]
-)
-def login():
-
-    form = LoginForm()
-
-    if form.validate_on_submit():
-
-        email = form.email.data.strip().lower()
-
-        user = User.query.filter_by(
-            email=email
-        ).first()
-
-
-        if (
-            user
-            and user.status
-            and user.check_password(
-                form.password.data
-            )
-        ):
-
-            login_user(user)
-
-            flash(
-                "Login successful.",
-                "success"
-            )
-
-            return redirect(
-                url_for("home")
-            )
-
-
-        flash(
-            "Invalid email or password.",
-            "danger"
-        )
-
-    return render_template(
-        "login.html",
-        form=form
-    )
-
-
-# =========================================================
-# LOGOUT
-# =========================================================
-
-@app.route("/logout")
-@login_required
-def logout():
-
-    logout_user()
-
-    flash(
-        "You have been logged out.",
-        "success"
-    )
-
-    return redirect(
-        url_for("home")
-    )
-
-
-# =========================================================
-# PROFILE
-# =========================================================
-
-@app.route("/profile")
-@login_required
-def profile():
-
-    return render_template(
-        "profile.html"
-    )
-
-
-# =========================================================
-# ERROR HANDLERS
-# =========================================================
-
-@app.errorhandler(403)
-def forbidden(error):
-
-    return "403 Forbidden", 403
-
-
-@app.errorhandler(404)
-def page_not_found(error):
-
-    return "404 Page Not Found", 404
-
-
-@app.errorhandler(413)
-def request_too_large(error):
-
-    return "File or request too large.", 413
-
-
-# =========================================================
-# SECURITY HEADERS (XSS & CONTENT SECURITY POLICY)
-# =========================================================
 
 @app.after_request
 def add_security_headers(response):
@@ -488,7 +177,7 @@ def add_security_headers(response):
     """
     csp_policy = (
         "default-src 'self'; "
-        "script-src 'self' https://cdn.jsdelivr.net; "
+        "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
         "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com data:; "
         "img-src 'self' data: https:; "
@@ -505,330 +194,132 @@ def add_security_headers(response):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
 
+
+# =========================================================
+# ERROR HANDLERS
+# =========================================================
+
+@app.errorhandler(400)
+def bad_request(error):
+    return "400 Bad Request", 400
+
+
+@app.errorhandler(403)
+def forbidden(error):
+    return "403 Forbidden", 403
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return "404 Page Not Found", 404
+
+
+@app.errorhandler(413)
+def request_too_large(error):
+    return "File or request too large.", 413
+
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return "500 Internal Server Error", 500
+
+
 # ============================================================
-# PRODUCTS
+# REGISTER MODULAR ROUTES
 # ============================================================
 
-@app.route("/products")
-def product_list():
-    module = "products"
+register_front_routes(app)
+register_admin_routes(app)
 
-    # --------------------------------------------------------
-    # Get all products
-    # --------------------------------------------------------
-    all_products = get_all_products()
-    filtered_products = list(all_products)  # copy to avoid mutation
 
-    # --------------------------------------------------------
-    # GET FILTER VALUES
-    # --------------------------------------------------------
-    query = request.args.get("q", "").strip()
-    selected_category = request.args.get("category", "").strip()
-    selected_brand = request.args.get("brand", "").strip()
-    selected_min_price = request.args.get("min_price", "").strip()
-    selected_max_price = request.args.get("max_price", "").strip()
-    selected_rating = request.args.get("rating", "").strip()
-    selected_sort = request.args.get("sort", "default").strip()
+# ============================================================
+# INITIALIZE DATABASE & DEFAULT SEED DATA
+# ============================================================
 
-    # ========================================================
-    # SEARCH
-    # ========================================================
-    if query:
-        search_text = query.lower()
-        filtered_products = [
-            product for product in filtered_products
-            if search_text in product.get("title", "").lower()
-            or search_text in product.get("description", "").lower()
-            or search_text in product.get("brand", "").lower()
-            or search_text in product.get("category", "").lower()
-        ]
+with app.app_context():
+    db.create_all()
 
-    # ========================================================
-    # CATEGORY FILTER
-    # ========================================================
-    if selected_category:
-        filtered_products = [
-            product for product in filtered_products
-            if product.get("category", "").lower() == selected_category.lower()
-        ]
-
-    # ========================================================
-    # BRAND FILTER
-    # ========================================================
-    if selected_brand:
-        filtered_products = [
-            product for product in filtered_products
-            if product.get("brand", "").lower() == selected_brand.lower()
-        ]
-
-    # ========================================================
-    # MINIMUM PRICE
-    # ========================================================
-    if selected_min_price:
-        try:
-            min_price = float(selected_min_price)
-            filtered_products = [
-                product for product in filtered_products
-                if float(product.get("price", 0)) >= min_price
-            ]
-        except ValueError:
-            pass
-
-    # ========================================================
-    # MAXIMUM PRICE
-    # ========================================================
-    if selected_max_price:
-        try:
-            max_price = float(selected_max_price)
-            filtered_products = [
-                product for product in filtered_products
-                if float(product.get("price", 0)) <= max_price
-            ]
-        except ValueError:
-            pass
-
-    # ========================================================
-    # RATING FILTER
-    # ========================================================
-    if selected_rating:
-        try:
-            minimum_rating = float(selected_rating)
-            filtered_products = [
-                product for product in filtered_products
-                if float(product.get("rating", 0)) >= minimum_rating
-            ]
-        except ValueError:
-            pass
-
-    # ========================================================
-    # SORTING
-    # ========================================================
-    if selected_sort == "newest":
-        filtered_products.sort(
-            key=lambda product: product.get("isNew", False),
-            reverse=True
+    # Seed default admin user
+    if not User.query.filter_by(username="admin").first():
+        admin_user = User(
+            username="admin",
+            email="admin@etech.com",
+            role="admin",
+            status=True
         )
-    elif selected_sort == "price_low":
-        filtered_products.sort(
-            key=lambda product: float(product.get("price", 0))
+        admin_user.set_password("admin123")
+        db.session.add(admin_user)
+
+    # Seed default customer user
+    demo_user = User.query.filter_by(username="demo").first()
+    if not demo_user:
+        demo_user = User(
+            username="demo",
+            email="demo@example.com",
+            role="customer",
+            phone="+855 12 345 678",
+            address="123 Technology Way, Suite 400, Phnom Penh",
+            status=True
         )
-    elif selected_sort == "price_high":
-        filtered_products.sort(
-            key=lambda product: float(product.get("price", 0)),
-            reverse=True
+        demo_user.set_password("password123")
+        db.session.add(demo_user)
+        db.session.commit()
+
+    # Seed initial orders for demo user if none exist
+    if demo_user and not Order.query.filter_by(user_id=demo_user.id).first():
+        order1 = Order(
+            order_number="ORD-1092",
+            user_id=demo_user.id,
+            customer_name="Demo User",
+            customer_email="demo@example.com",
+            shipping_address="123 Technology Way, Suite 400",
+            city="Phnom Penh",
+            payment_method="Credit / Debit Card",
+            subtotal=1399.00,
+            shipping_fee=0.0,
+            total_amount=1399.00,
+            status="Delivered",
+            items_summary="1x Apple iPhone 17 Pro Max (256GB)",
+            created_at=get_utc_now() - timedelta(days=2)
         )
-    elif selected_sort == "rating":
-        filtered_products.sort(
-            key=lambda product: float(product.get("rating", 0)),
-            reverse=True
+        order2 = Order(
+            order_number="ORD-1085",
+            user_id=demo_user.id,
+            customer_name="Demo User",
+            customer_email="demo@example.com",
+            shipping_address="123 Technology Way, Suite 400",
+            city="Phnom Penh",
+            payment_method="ABA PAY / Bakong QR",
+            subtotal=399.00,
+            shipping_fee=0.0,
+            total_amount=399.00,
+            status="Delivered",
+            items_summary="1x Sony WH-1000XM6 Wireless Headphones",
+            created_at=get_utc_now() - timedelta(days=40)
         )
-    elif selected_sort == "name":
-        filtered_products.sort(
-            key=lambda product: product.get("title", "").lower()
-        )
+        db.session.add_all([order1, order2])
 
-    # ========================================================
-    # FILTER OPTIONS
-    # ========================================================
-    categories = sorted({
-        product.get("category", "")
-        for product in all_products if product.get("category")
-    })
-
-    brands = sorted({
-        product.get("brand", "")
-        for product in all_products if product.get("brand")
-    })
-
-    # ========================================================
-    # RENDER PRODUCTS PAGE
-    # ========================================================
-    return render_template(
-        "front/products/products.html",
-        products=filtered_products,
-        categories=categories,
-        brands=brands,
-        query=query,
-        selected_category=selected_category,
-        selected_brand=selected_brand,
-        selected_min_price=selected_min_price,
-        selected_max_price=selected_max_price,
-        selected_rating=selected_rating,
-        selected_sort=selected_sort,
-        module=module,
-    )
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
 
 
 # ============================================================
-# PRODUCT DETAIL
+# RE-EXPORTS FOR BACKWARDS COMPATIBILITY & TEST SUITES
 # ============================================================
 
-@app.route("/product/<int:product_id>")
-def product_detail(product_id):
-    module = "products"
-    product = get_product_by_id(product_id)
-    if not product:
-        # Fallback to first product if ID not found
-        all_products = get_all_products()
-        product = all_products[0] if all_products else {}
-
-    all_products = get_all_products()
-    related = [p for p in all_products if p.get("category") == product.get("category") and p.get("id") != product.get("id")][:4]
-
-    return render_template(
-        "front/products/detail.html",
-        product=product,
-        related_products=related,
-        module=module,
-    )
-
-
-# ============================================================
-# DEALS PAGE
-# ============================================================
-
-@app.route("/deals")
-def deals():
-    module = "deals"
-    products = get_all_products()
-    return render_template(
-        "front/deals.html",
-        products=products,
-        module=module,
-    )
-
-
-# ============================================================
-# ABOUT PAGE
-# ============================================================
-
-@app.route("/about")
-def about():
-    module = "about"
-    return render_template(
-        "front/about.html",
-        module=module,
-    )
-
-
-# ============================================================
-# CART PAGE
-# ============================================================
-
-@app.route("/cart")
-def cart():
-    module = "cart"
-    return render_template(
-        "front/cart.html",
-        module=module,
-    )
-
-
-# ============================================================
-# WISHLIST PAGE
-# ============================================================
-
-@app.route("/wishlist")
-def wishlist():
-    module = "wishlist"
-    return render_template(
-        "front/wishlist.html",
-        module=module,
-    )
-
-
-# ============================================================
-# ADMIN ROUTES
-# ============================================================
-
-@app.route("/admin")
-def admin_dashboard():
-    products = get_all_products()
-    return render_template(
-        "admin/dashboard.html",
-        products=products,
-        active_page="dashboard",
-    )
-
-
-@app.route("/admin/products")
-def admin_products():
-    products = get_all_products()
-    return render_template(
-        "admin/products.html",
-        products=products,
-        active_page="products",
-    )
-
-
-@app.route("/admin/products/new")
-def admin_product_new():
-    return render_template(
-        "admin/product_form.html",
-        product=None,
-        is_edit=False,
-        active_page="products",
-    )
-
-
-@app.route("/admin/products/edit/<int:product_id>")
-def admin_product_edit(product_id):
-    product = get_product_by_id(product_id)
-    return render_template(
-        "admin/product_form.html",
-        product=product,
-        is_edit=True,
-        active_page="products",
-    )
-
-
-@app.route("/admin/categories")
-def admin_categories():
-    return render_template(
-        "admin/categories.html",
-        active_page="categories",
-    )
-
-
-@app.route("/admin/orders")
-def admin_orders():
-    return render_template(
-        "admin/orders.html",
-        active_page="orders",
-    )
-
-
-@app.route("/admin/orders/<order_id>")
-def admin_order_detail(order_id):
-    return render_template(
-        "admin/order_detail.html",
-        order_id=order_id,
-        active_page="orders",
-    )
-
-
-@app.route("/admin/customers")
-def admin_customers():
-    return render_template(
-        "admin/customers.html",
-        active_page="customers",
-    )
-
-
-@app.route("/admin/deals")
-def admin_deals():
-    return render_template(
-        "admin/deals.html",
-        active_page="deals",
-    )
-
-
-@app.route("/admin/settings")
-def admin_settings():
-    return render_template(
-        "admin/settings.html",
-        active_page="settings",
-    )
+__all__ = [
+    "app",
+    "db",
+    "User",
+    "Order",
+    "LoginForm",
+    "RegisterForm",
+    "brute_force_protector",
+    "validate_password_complexity",
+    "rate_limiter",
+]
 
 
 # ============================================================
@@ -837,4 +328,3 @@ def admin_settings():
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
-

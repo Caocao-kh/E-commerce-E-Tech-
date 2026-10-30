@@ -1,0 +1,239 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Administrator Profile | E-Tech Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="fw-bold mb-1">Administrator Profile</h3>
+    <p class="text-muted small mb-0">Manage executive account credentials, contact info, and security preferences.</p>
+  </div>
+  <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+    <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+  </a>
+</div>
+
+<div class="row g-4">
+
+  <!-- Left Column: Admin Identity Badge Card -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white mb-4">
+      <div class="position-relative d-inline-block mx-auto mb-3">
+        {% if current_user.profile_image %}
+          <img src="{{ url_for('static', filename=current_user.profile_image) }}" 
+               alt="{{ current_user.username }}" 
+               class="rounded-circle shadow-sm object-fit-cover mx-auto border border-3 border-primary" 
+               style="width: 110px; height: 110px;"
+               onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default-avatar.svg') }}';">
+        {% else %}
+          <div class="bg-primary text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto fw-bold" 
+               style="width: 110px; height: 110px; font-size: 2.75rem;">
+            {{ current_user.username[0]|upper }}
+          </div>
+        {% endif %}
+        <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle p-2" title="Active Administrator Session"></span>
+      </div>
+
+      <h4 class="fw-bold mb-1">{{ current_user.username }}</h4>
+      <p class="text-muted small mb-2"><i class="bi bi-envelope me-1"></i>{{ current_user.email }}</p>
+      
+      <div class="mb-3">
+        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 text-uppercase fw-semibold font-monospace" style="font-size: 0.75rem;">
+          <i class="bi bi-shield-check me-1"></i> Super Administrator
+        </span>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="text-start text-muted small d-flex flex-column gap-2 mb-4">
+        <div class="d-flex justify-content-between">
+          <span><i class="bi bi-calendar3 me-2"></i>Joined:</span>
+          <strong class="text-dark">{{ current_user.created_at.strftime('%b %d, %Y') if current_user.created_at else 'Oct 2026' }}</strong>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span><i class="bi bi-telephone me-2"></i>Phone:</span>
+          <strong class="text-dark">{{ current_user.phone or 'Not configured' }}</strong>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span><i class="bi bi-shield-lock me-2 text-primary"></i>Security:</span>
+          <strong class="text-success">PBKDF2-SHA256</strong>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span><i class="bi bi-activity me-2 text-info"></i>Status:</span>
+          <span class="badge bg-success-subtle text-success">Active &amp; Verified</span>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2">
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-danger rounded-pill">
+          <i class="bi bi-box-arrow-right me-2"></i> Log Out of Admin
+        </a>
+      </div>
+    </div>
+
+    <!-- Security Information Box -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+      <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-shield-shaded me-2 text-primary"></i>Portal Protection</h6>
+      <ul class="list-unstyled text-muted small mb-0 d-flex flex-column gap-2">
+        <li><i class="bi bi-check-circle-fill text-success me-2"></i>Web Application Firewall (WAF) Enabled</li>
+        <li><i class="bi bi-check-circle-fill text-success me-2"></i>Sliding-Window Brute Force Defense Active</li>
+        <li><i class="bi bi-check-circle-fill text-success me-2"></i>DDoS IP Rate Limiter Active</li>
+        <li><i class="bi bi-check-circle-fill text-success me-2"></i>Session HttpOnly &amp; SameSite Enforced</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Right Column: Edit Forms -->
+  <div class="col-lg-8">
+
+    <!-- Card 1: Account Information -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-person-gear me-2 text-primary"></i>Administrator Credentials</h5>
+        <span class="badge bg-light text-muted border">General Info</span>
+      </div>
+      
+      <form method="POST" action="{{ url_for('admin_profile') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <input type="hidden" name="action" value="update_details">
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="admin_user_name" class="form-label fw-semibold">Username <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-person"></i></span>
+              <input type="text" id="admin_user_name" name="username" class="form-control border-start-0" value="{{ current_user.username }}" required minlength="3" maxlength="80">
+            </div>
+            <small class="text-muted">Unique administrator login handle.</small>
+          </div>
+
+          <div class="col-md-6">
+            <label for="admin_user_email" class="form-label fw-semibold">Official Admin Email <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope"></i></span>
+              <input type="email" id="admin_user_email" name="email" class="form-control border-start-0" value="{{ current_user.email }}" required>
+            </div>
+            <small class="text-muted">Used for critical system notifications.</small>
+          </div>
+
+          <div class="col-md-6">
+            <label for="admin_user_phone" class="form-label fw-semibold">Contact Phone Number</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone"></i></span>
+              <input type="tel" id="admin_user_phone" name="phone" class="form-control border-start-0" value="{{ current_user.phone or '' }}" placeholder="+855 12 345 678">
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Administrative Role</label>
+            <input type="text" class="form-control bg-light" value="{{ current_user.role|title }} (Highest Level)" readonly disabled>
+          </div>
+
+          <div class="col-12">
+            <label for="admin_profile_image" class="form-label fw-semibold">Upload Executive Avatar</label>
+            <div class="input-group">
+              <input type="file" id="admin_profile_image" name="profile_image" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp, image/gif">
+              <span class="input-group-text bg-light"><i class="bi bi-image text-muted"></i></span>
+            </div>
+            <small class="text-muted">Allowed formats: PNG, JPG, JPEG, WEBP, GIF. Maximum file size: 2MB.</small>
+          </div>
+        </div>
+
+        <div class="mt-4 text-end">
+          <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            <i class="bi bi-check2-circle me-1"></i> Save Administrator Details
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Card 2: Password Security & Change -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-key-fill me-2 text-warning"></i>Security &amp; Password Update</h5>
+        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">High Security</span>
+      </div>
+
+      <p class="text-muted small mb-4">
+        To maintain executive system integrity, choose a complex password meeting enterprise security criteria.
+      </p>
+
+      <form method="POST" action="{{ url_for('admin_profile') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+        <input type="hidden" name="action" value="change_password">
+
+        <div class="row g-3">
+          <div class="col-12">
+            <label for="current_password" class="form-label fw-semibold">Current Administrator Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock"></i></span>
+              <input type="password" id="current_password" name="current_password" class="form-control border-start-0 border-end-0" placeholder="Enter current password" required>
+              <button class="btn btn-outline-secondary input-group-text bg-light border-start-0" type="button" onclick="togglePassVisibility('current_password', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="new_password" class="form-label fw-semibold">New Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-lock"></i></span>
+              <input type="password" id="new_password" name="new_password" class="form-control border-start-0 border-end-0" placeholder="••••••••" required minlength="8">
+              <button class="btn btn-outline-secondary input-group-text bg-light border-start-0" type="button" onclick="togglePassVisibility('new_password', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="confirm_password" class="form-label fw-semibold">Confirm New Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-check"></i></span>
+              <input type="password" id="confirm_password" name="confirm_password" class="form-control border-start-0 border-end-0" placeholder="••••••••" required minlength="8">
+              <button class="btn btn-outline-secondary input-group-text bg-light border-start-0" type="button" onclick="togglePassVisibility('confirm_password', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Password Requirement Indicators -->
+          <div class="col-12">
+            <div class="p-3 bg-light rounded-3 small">
+              <div class="fw-semibold text-dark mb-1">Password Requirements:</div>
+              <div class="row g-2 text-muted" style="font-size: 0.8rem;">
+                <div class="col-sm-6"><i class="bi bi-dot text-primary"></i> At least 8 characters long</div>
+                <div class="col-sm-6"><i class="bi bi-dot text-primary"></i> At least one uppercase letter (A-Z)</div>
+                <div class="col-sm-6"><i class="bi bi-dot text-primary"></i> At least one lowercase letter (a-z)</div>
+                <div class="col-sm-6"><i class="bi bi-dot text-primary"></i> At least one digit (0-9) &amp; special symbol (!@#$)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 text-end">
+          <button type="submit" class="btn btn-warning rounded-pill px-4 shadow-sm text-dark fw-semibold">
+            <i class="bi bi-shield-lock-fill me-1"></i> Update Administrator Password
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function togglePassVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.replace('bi-eye', 'bi-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.replace('bi-eye-slash', 'bi-eye');
+  }
+}
+</script>
+{% endblock %}

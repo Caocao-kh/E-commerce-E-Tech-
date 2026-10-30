@@ -55,7 +55,7 @@
         </div>
       </form>
 
-      <!-- Customer Action Icons -->
+      <!-- Customer Action Icons & User Account -->
       <div class="d-none d-lg-flex align-items-center gap-2">
         <a href="{{ url_for('wishlist') }}" class="btn btn-outline-dark border-0 rounded-circle position-relative p-2" title="Wishlist">
           <i class="bi bi-heart fs-5"></i>
@@ -67,9 +67,47 @@
           <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark cart-count" style="font-size: 0.65rem;">0</span>
         </a>
 
-        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-dark btn-sm rounded-pill px-3 ms-2" title="Admin Portal">
-          <i class="bi bi-speedometer2 me-1"></i> Admin
-        </a>
+        {% if current_user is defined and current_user.is_authenticated %}
+          <div class="dropdown ms-1">
+            <button class="btn btn-outline-dark btn-sm rounded-pill dropdown-toggle d-flex align-items-center gap-2 px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if current_user.profile_image %}
+                <img src="{{ url_for('static', filename=current_user.profile_image) }}" 
+                     alt="{{ current_user.username }}" 
+                     class="rounded-circle object-fit-cover" 
+                     style="width: 22px; height: 22px;"
+                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default-avatar.svg') }}';">
+              {% else %}
+                <i class="bi bi-person-circle"></i>
+              {% endif %}
+              <span class="fw-semibold">{{ current_user.username }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-3">
+              <li class="px-3 py-2 border-bottom">
+                <div class="fw-bold small">{{ current_user.username }}</div>
+                <div class="text-muted small text-truncate" style="max-width: 170px;">{{ current_user.email }}</div>
+                <span class="badge {% if current_user.role == 'admin' %}bg-primary-subtle text-primary{% else %}bg-secondary-subtle text-dark{% endif %} mt-1" style="font-size: 0.65rem;">
+                  {{ current_user.role|upper }} ACCOUNT
+                </span>
+              </li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('profile') }}"><i class="bi bi-person me-2"></i>My Profile</a></li>
+              {% if current_user.role == 'admin' %}
+                <li><a class="dropdown-item py-2 fw-semibold text-primary" href="{{ url_for('admin_dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</a></li>
+              {% endif %}
+              <li><hr class="dropdown-divider my-1"></li>
+              <li><a class="dropdown-item py-2 text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Log Out</a></li>
+            </ul>
+          </div>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-outline-dark btn-sm rounded-pill px-3 ms-1">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Login
+          </a>
+          <a href="{{ url_for('register') }}" class="btn btn-dark btn-sm rounded-pill px-3">
+            Register
+          </a>
+          <a href="{{ url_for('admin_login') }}" class="btn btn-outline-secondary btn-sm rounded-circle p-2 ms-1" title="Administrator Login">
+            <i class="bi bi-speedometer2"></i>
+          </a>
+        {% endif %}
       </div>
 
     </div>
